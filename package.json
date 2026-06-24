@@ -1,0 +1,16 @@
+{
+  "name": "typingchallengesmkdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "clasp push -f && git add . && git commit -m \"Auto-update & deploy dari VSCode\" && git push origin main"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chafidnur/typingchallengesmkdk.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
