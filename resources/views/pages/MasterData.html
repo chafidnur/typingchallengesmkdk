@@ -195,8 +195,8 @@
                     <div class="col-md-3">
                         <label class="form-label text-secondary small">Status Aktif</label>
                         <select class="form-select form-select-dark" id="inStatus" required>
-                            <option value="Y">Aktif</option>
-                            <option value="N">Nonaktif</option>
+                            <option value="1">Aktif</option>
+                            <option value="0">Nonaktif</option>
                         </select>
                     </div>
 
@@ -358,7 +358,7 @@
                         html = '<tr><td colspan="6" class="text-center text-secondary py-4">Belum ada data pengguna.</td></tr>';
                     } else {
                         data.forEach(s => {
-                            let statusBadge = s.status === 'Y' ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Nonaktif</span>';
+                            let statusBadge = (s.status == 1 || s.status == '1') ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Nonaktif</span>';
                             let roleBadge = s.role === 'SISWA' ? '<span class="badge bg-primary">SISWA</span>' : `<span class="badge bg-warning text-dark">${s.role}</span>`;
                             
                             html += `

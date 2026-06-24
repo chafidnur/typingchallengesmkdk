@@ -75,7 +75,7 @@ function simpanUserBaru(dataSiswa) {
       "-",                               // 14: gelar
       "",                                // 15: login_terakhir 
       dataSiswa.tahun_lulus || "-",      // 16: tahun_lulus
-      dataSiswa.status_aktif || "Y",     // 17: status_aktif
+      dataSiswa.status_aktif !== undefined ? dataSiswa.status_aktif : 1, // 17: status_aktif (1 atau 0)
       now,                               // 18: created_at
       dataSiswa.created_by || "ADMIN",   // 19: created_by
       now,                               // 20: update_at
