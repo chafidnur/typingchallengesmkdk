@@ -79,23 +79,33 @@ function simpanSkorPemain(kd_user, wpm, accuracy, salah, total_karakter, durasi)
 }
 
 /**
- * Menarik data statistik terbaik untuk ditampilkan di Dashboard
- * @param {string} kd_user
- * @return {Object} Wpm dan Accuracy terbaik
+ * Mengambil daftar Top 10 Pemain berdasarkan WPM Terbaik
+ * @return {Array} Array of Object berisi data pemain
  */
-function getUserStats(kd_user) {
+function getLeaderboard() {
   const ss = SpreadsheetApp.openById(DB_ID);
   const sheetUser = ss.getSheetByName("users");
-  if(!sheetUser) return { wpm: 0, acc: 0 };
+  if (!sheetUser) return [];
 
-  const dataUser = sheetUser.getDataRange().getValues();
-  for(let i = 1; i < dataUser.length; i++) {
-    if(dataUser[i][0] === kd_user) {
-      return {
-        wpm: dataUser[i][11] || 0, // total_wpm_terbaik
-        acc: dataUser[i][12] || 0  // total_accuracy_terbaik
-      };
+  const data = sheetUser.getDataRange().getValues();
+  let players = [];
+
+  // Mulai dari baris 2 (index 1) untuk mengabaikan header
+  for (let i = 1; i < data.length; i++) {
+    // Hanya ambil role SISWA yang statusnya aktif (Asumsi kolom S (Index 18) = 'Y')
+    if (data[i][6] === "SISWA") { 
+      players.push({
+        nama: data[i][5],             // Kolom F
+        level: data[i][7] || 1,       // Kolom H
+        wpm: data[i][11] || 0,        // Kolom L
+        acc: data[i][12] || 0         // Kolom M
+      });
     }
   }
-  return { wpm: 0, acc: 0 };
+
+  // Urutkan array secara menurun (Descending) berdasarkan WPM tertinggi
+  players.sort((a, b) => b.wpm - a.wpm);
+
+  // Potong array, kembalikan hanya 10 pemain teratas
+  return players.slice(0, 10);
 }

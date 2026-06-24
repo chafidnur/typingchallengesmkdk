@@ -29,51 +29,62 @@ function getProfilSiswa(kd_user) {
 }
 
 /**
- * (Persiapan V1.1) Menambahkan EXP harian atau EXP latihan ke akun siswa
+ * Menambahkan EXP harian atau latihan, serta menghitung Level Up
  * @param {string} kd_user - Kode unik pengguna
  * @param {number} jumlah_exp - Total EXP yang didapatkan
- * @param {string} aktivitas - Deskripsi sumber EXP (Contoh: LOGIN_HARIAN, LATIHAN)
- * @return {boolean} Status keberhasilan
+ * @param {string} aktivitas - Deskripsi sumber EXP 
+ * @return {Object} Status dan info level up
  */
 function tambahExpSiswa(kd_user, jumlah_exp, aktivitas) {
   try {
     const ss = SpreadsheetApp.openById(DB_ID);
     
-    // 1. Catat riwayat perolehan EXP ke sheet 'exp_log'
+    // 1. Catat riwayat perolehan EXP
     const sheetExpLog = ss.getSheetByName("exp_log");
     if(sheetExpLog) {
       let now = new Date();
       let kdExpLog = "EXP-" + now.getTime();
-      // Format: [kd_exp_log, fkd_user, aktivitas, exp_didapat, keterangan, tanggal, created_at]
       sheetExpLog.appendRow([
-        kdExpLog, kd_user, aktivitas, jumlah_exp, "Sistem V1.0", now, now
+        kdExpLog, kd_user, aktivitas, jumlah_exp, "Sistem V1.1", now, now
       ]);
     }
 
-    // 2. Tambahkan EXP ke profil master user (sheet 'users')
+    // 2. Kalkulasi EXP dan Level di profil Master User
     const sheetUser = ss.getSheetByName("users");
     if(sheetUser) {
       const dataUser = sheetUser.getDataRange().getValues();
       for(let i = 1; i < dataUser.length; i++) {
         if(dataUser[i][0] === kd_user) {
           
-          let expLama = Number(dataUser[i][8]) || 0;
-          let totalExpLama = Number(dataUser[i][9]) || 0;
+          let levelLama = Number(dataUser[i][7]) || 1; // Kolom H (Index 7)
+          let expLama = Number(dataUser[i][8]) || 0;   // Kolom I (Index 8)
+          let totalExpLama = Number(dataUser[i][9]) || 0; // Kolom J (Index 9)
           
           let expBaru = expLama + Number(jumlah_exp);
           let totalExpBaru = totalExpLama + Number(jumlah_exp);
+          let levelBaru = levelLama;
+          let isLevelUp = false;
+
+          // Rumus sederhana: Butuh (Level x 100) EXP untuk naik ke level berikutnya
+          let expDibutuhkan = levelLama * 100;
+
+          if (expBaru >= expDibutuhkan) {
+            levelBaru++; // Naik level!
+            expBaru = expBaru - expDibutuhkan; // Sisa EXP dipindah ke level baru
+            isLevelUp = true;
+          }
           
-          // Tulis ulang nilai EXP ke kolom I (index 9) dan J (index 10)
+          // Simpan pembaruan ke Spreadsheet
+          sheetUser.getRange(i + 1, 8).setValue(levelBaru);
           sheetUser.getRange(i + 1, 9).setValue(expBaru);
           sheetUser.getRange(i + 1, 10).setValue(totalExpBaru);
           
-          // Logika Kenaikan Level (Level Up) akan ditambahkan di sini pada V1.1
-          break;
+          return { status: true, isLevelUp: isLevelUp, levelBaru: levelBaru };
         }
       }
     }
-    return true;
+    return { status: false };
   } catch(e) {
-    return false;
+    return { status: false, message: e.message };
   }
 }
