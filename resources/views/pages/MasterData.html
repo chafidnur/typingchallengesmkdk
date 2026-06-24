@@ -16,7 +16,7 @@
         margin-top: 20px;
     }
 
-    /* Custom Nav Tabs untuk Tema Gelap */
+    /* Custom Nav Tabs */
     .nav-tabs .nav-link {
         color: #94a3b8;
         border: none;
@@ -82,6 +82,15 @@
         border-color: #3b82f6;
         box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
     }
+
+    /* Box Info Riwayat */
+    .info-box {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+    }
 </style>
 
 <div class="master-wrapper">
@@ -105,9 +114,6 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-kelas" type="button" role="tab">Data Kelas (V1.2)</button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tahun" type="button" role="tab">Tahun Ajaran (V1.2)</button>
-        </li>
     </ul>
 
     <div class="tab-content" id="masterTabsContent">
@@ -118,6 +124,7 @@
                     <div class="w-50">
                         <input type="text" id="searchSiswa" class="form-control form-control-dark rounded-pill" placeholder="Pencarian Nama / NIS / Kelas...">
                     </div>
+                    <!-- Tombol Tambah User Tetap Ada -->
                     <button class="btn btn-success rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#modalTambahUser">
                         <i class="fas fa-user-plus me-2"></i> TAMBAH USER
                     </button>
@@ -130,16 +137,15 @@
                                 <th>Role</th>
                                 <th>NIS/NIP</th>
                                 <th>Nama Lengkap</th>
-                                <th>Kelas</th>
                                 <th>Akun Login</th>
                                 <th>Status</th>
+                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="bodyTableSiswa">
                             <tr>
                                 <td colspan="6" class="text-center py-4">
                                     <div class="spinner-border text-primary" role="status"></div>
-                                    <div class="mt-2 text-secondary">Memuat data dari database...</div>
                                 </td>
                             </tr>
                         </tbody>
@@ -148,23 +154,16 @@
             </div>
         </div>
 
-        <!-- TAB 2 & 3: PLACEHOLDER -->
         <div class="tab-pane fade" id="tab-kelas" role="tabpanel">
             <div class="glass-panel text-center py-5 text-secondary">
                 <i class="fas fa-tools fa-3x mb-3"></i>
                 <h4>Fitur Kelola Kelas Sedang Dibangun</h4>
             </div>
         </div>
-        <div class="tab-pane fade" id="tab-tahun" role="tabpanel">
-            <div class="glass-panel text-center py-5 text-secondary">
-                <i class="fas fa-tools fa-3x mb-3"></i>
-                <h4>Fitur Kelola Tahun Ajaran Sedang Dibangun</h4>
-            </div>
-        </div>
     </div>
 </div>
 
-<!-- MODAL TAMBAH USER -->
+<!-- MODAL TAMBAH USER (Dengan Input Manual Kode User) -->
 <div class="modal fade" id="modalTambahUser" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content dark-modal">
@@ -176,6 +175,11 @@
             </div>
             <form id="formTambahUser">
                 <div class="modal-body row g-3">
+                    <div class="col-md-12 mb-2 pb-3 border-bottom border-secondary">
+                        <label class="form-label text-warning fw-bold small"><i class="fas fa-key me-1"></i> Kode User (Manual)</label>
+                        <input type="text" class="form-control form-control-dark border-warning" id="inKdUser" placeholder="Contoh: USR-001, GURU-01" required>
+                    </div>
+
                     <div class="col-md-6">
                         <label class="form-label text-secondary small">Nama Lengkap</label>
                         <input type="text" class="form-control form-control-dark" id="inNama" required>
@@ -213,11 +217,6 @@
                         <label class="form-label text-secondary small">Password</label>
                         <input type="text" class="form-control form-control-dark" id="inPassword" required>
                     </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label text-secondary small">Tahun Lulus (Khusus Siswa)</label>
-                        <input type="text" class="form-control form-control-dark" id="inTahunLulus" placeholder="Contoh: 2026">
-                    </div>
                 </div>
                 <div class="modal-footer border-secondary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
@@ -231,7 +230,117 @@
     </div>
 </div>
 
+<!-- MODAL LIHAT RIWAYAT -->
+<div class="modal fade" id="modalRiwayat" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content dark-modal">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title fw-bold" style="font-family: 'Orbitron', sans-serif;">
+                    <i class="fas fa-history text-info me-2"></i> RIWAYAT LATIHAN USER
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="bodyRiwayat">
+                <!-- Konten dinamis riwayat akan masuk ke sini -->
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    // Fungsi untuk membuka Modal Riwayat dan menarik data dari server
+    function bukaRiwayat(kdUser) {
+        $('#modalRiwayat').modal('show');
+        $('#bodyRiwayat').html('<div class="text-center py-5"><div class="spinner-border text-info" role="status"></div><p class="mt-2 text-secondary">Menganalisis rekam jejak...</p></div>');
+
+        google.script.run
+            .withSuccessHandler(function(res) {
+                if(!res.detail) {
+                    $('#bodyRiwayat').html('<div class="alert alert-danger">User tidak ditemukan.</div>');
+                    return;
+                }
+
+                // Render Info Profil Atas
+                let html = `
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="fw-bold mb-0 text-white">${res.detail.nama}</h4>
+                            <div class="text-secondary small">NIS: ${res.detail.nis} | Kelas: ${res.detail.kelas}</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-primary fs-6 rounded-pill mb-1">Level ${res.detail.level}</span><br>
+                            <span class="badge bg-warning text-dark"><i class="fas fa-star me-1"></i>${res.detail.gelar || 'Belum ada gelar'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-4">
+                            <div class="info-box border-info">
+                                <div class="text-secondary small">Total Main</div>
+                                <h3 class="fw-bold text-info mb-0">${res.total_main} <span class="fs-6">x</span></h3>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="info-box border-success">
+                                <div class="text-secondary small">Top Speed</div>
+                                <h3 class="fw-bold text-success mb-0">${res.detail.wpm_terbaik} <span class="fs-6">WPM</span></h3>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="info-box border-warning">
+                                <div class="text-secondary small">Top Acc</div>
+                                <h3 class="fw-bold text-warning mb-0">${res.detail.acc_terbaik}%</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <h6 class="fw-bold text-secondary mb-3 border-bottom border-secondary pb-2">Log Riwayat Mengetik Terakhir:</h6>
+                `;
+
+                // Render Tabel Histori
+                if(res.history.length === 0) {
+                    html += `<div class="alert alert-dark text-center border-secondary">Siswa belum pernah melakukan latihan mengetik.</div>`;
+                } else {
+                    html += `
+                        <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                            <table class="table table-dark table-sm table-hover text-center">
+                                <thead style="position: sticky; top: 0; background: #1e293b;">
+                                    <tr>
+                                        <th>Waktu</th>
+                                        <th>WPM</th>
+                                        <th>Akurasi</th>
+                                        <th>Kesalahan</th>
+                                        <th>Durasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    res.history.forEach(h => {
+                        let dateObj = new Date(h.tanggal);
+                        let tglFormat = dateObj.toLocaleDateString('id-ID') + ' ' + dateObj.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+                        html += `
+                                    <tr>
+                                        <td class="text-secondary small">${tglFormat}</td>
+                                        <td class="text-info fw-bold">${h.wpm}</td>
+                                        <td class="text-success">${h.acc}%</td>
+                                        <td class="text-danger">${h.salah}</td>
+                                        <td class="text-warning">${h.durasi}s</td>
+                                    </tr>
+                        `;
+                    });
+                    html += `</tbody></table></div>`;
+                }
+                
+                $('#bodyRiwayat').html(html);
+            })
+            .withFailureHandler(function(err) {
+                $('#bodyRiwayat').html(`<div class="alert alert-danger text-center">Gagal menarik data riwayat: ${err.message}</div>`);
+            })
+            .getRiwayatSiswa(kdUser);
+    }
+
     $(document).ready(function() {
         // 1. Fungsi Memuat Data Tabel
         function muatTabelSiswa() {
@@ -249,29 +358,32 @@
                                 <tr class="baris-siswa">
                                     <td>${roleBadge}</td>
                                     <td class="kolom-pencarian fw-bold text-info">${s.nis}</td>
-                                    <td class="kolom-pencarian">${s.nama}</td>
-                                    <td class="kolom-pencarian">${s.kelas}</td>
+                                    <td class="kolom-pencarian">
+                                        <div class="fw-bold">${s.nama}</div>
+                                        <div class="small text-secondary">Kls: ${s.kelas}</div>
+                                    </td>
                                     <td>
                                         <div class="small text-secondary"><i class="fas fa-user-ninja me-1"></i> ${s.username}</div>
                                         <div class="small text-secondary"><i class="fas fa-key me-1"></i> ${s.password}</div>
                                     </td>
                                     <td>${statusBadge}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-info rounded-pill" onclick="bukaRiwayat('${s.kd_user}')" title="Lihat Riwayat">
+                                            <i class="fas fa-history me-1"></i> Riwayat
+                                        </button>
+                                    </td>
                                 </tr>
                             `;
                         });
                     }
                     $('#bodyTableSiswa').html(html);
                 })
-                .withFailureHandler(function(err) {
-                    $('#bodyTableSiswa').html(`<tr><td colspan="6" class="text-center text-danger py-4">Error: ${err.message}</td></tr>`);
-                })
                 .getListSiswa();
         }
 
-        // Panggil fungsi muat tabel saat halaman dibuka
         muatTabelSiswa();
 
-        // 2. Logika Live Search (Pencarian)
+        // 2. Logika Live Search
         $('#searchSiswa').on('keyup', function() {
             let keyword = $(this).val().toLowerCase();
             $('.baris-siswa').filter(function() {
@@ -279,18 +391,17 @@
             });
         });
 
-        // 3. Logika Submit Form Tambah User
+        // 3. Logika Submit Form Tambah User Manual
         $('#formTambahUser').on('submit', function(e) {
             e.preventDefault();
             
             $('#btnSimpanUser').prop('disabled', true);
             $('#spinSimpan').removeClass('d-none');
 
-            // Ambil nama pembuat dari LocalStorage (Admin yang sedang login)
             let creatorName = localStorage.getItem('nama_user') || 'ADMIN_SISTEM';
 
-            // Mengumpulkan data lengkap sesuai form
             let dataSiswaBaru = {
+                kd_user: $('#inKdUser').val(), // Mengambil ID Manual
                 nama: $('#inNama').val(),
                 role: $('#inRole').val(),
                 status_aktif: $('#inStatus').val(),
@@ -298,11 +409,9 @@
                 fkd_kelas: $('#inKelas').val(),
                 username: $('#inUsername').val(),
                 password: $('#inPassword').val(),
-                tahun_lulus: $('#inTahunLulus').val(),
                 created_by: creatorName
             };
 
-            // Kirim ke API MasterController.gs
             google.script.run
                 .withSuccessHandler(function(response) {
                     $('#btnSimpanUser').prop('disabled', false);
