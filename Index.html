@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Challenge - SMK Duta Karya</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- ========================================== -->
+    <!-- PERBAIKAN: SCRIPT DIPINDAH KE ATAS SINI    -->
+    <!-- ========================================== -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* Reset & Tema Global */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a; 
+            color: #ffffff;
+            overflow-x: hidden; 
+            min-height: 100vh;
+        }
+        #app-content { width: 100%; min-height: 100vh; display: block; }
+    </style>
+</head>
+<body>
+  <div id="mobileBlocker" class="d-none" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px;">
+        <i class="fas fa-desktop fa-5x text-primary mb-4" style="text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);"></i>
+        <h2 class="text-white fw-bold mb-3" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">AKSES DITOLAK</h2>
+        <p class="text-secondary fs-5" style="max-width: 500px;">
+            Aplikasi Typing Challenge ini dirancang khusus untuk melatih kecepatan jari pada <b>Keyboard Komputer / Laptop</b>.<br><br>
+            Akses melalui ponsel pintar atau tablet tidak diizinkan. Silakan buka web ini melalui PC/Laptop Anda untuk mulai bermain.
+        </p>
+    </div>
+
+    <script>
+        function checkDevice() {
+            // Deteksi berdasarkan User Agent (Android/iOS) atau ukuran layar (< 768px)
+            let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+            
+            if (isMobile) {
+                // Sembunyikan aplikasi utama dan tampilkan layar blokir
+                document.getElementById('app-content').style.display = 'none';
+                document.getElementById('mobileBlocker').classList.remove('d-none');
+                document.getElementById('mobileBlocker').classList.add('d-flex');
+            } else {
+                // Pastikan normal jika dibuka di PC
+                document.getElementById('app-content').style.display = 'block';
+                document.getElementById('mobileBlocker').classList.add('d-none');
+                document.getElementById('mobileBlocker').classList.remove('d-flex');
+            }
+        }
+
+        // Jalankan saat web pertama kali dibuka
+        checkDevice();
+        
+        // Jalankan saat ukuran jendela browser diubah
+        window.addEventListener('resize', checkDevice);
+    </script>
+
+    <!-- Memanggil Utils.html LEBIH DULU agar fungsi loadPage sudah siap -->
+    <?!= include('Utils'); ?>
+
+    <!-- Wadah Konten: Memanggil Login.html -->
+    <div id="app-content">
+        <?!= include('Login'); ?>
+    </div>
+
+    <button id="btnFullscreen" onclick="toggleFullScreen()" title="Layar Penuh"
+            style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; 
+                   background: rgba(15, 23, 42, 0.8); color: #3b82f6; 
+                   border: 2px solid #3b82f6; border-radius: 50%; 
+                   width: 55px; height: 55px; cursor: pointer; 
+                   display: flex; align-items: center; justify-content: center; 
+                   box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); 
+                   backdrop-filter: blur(5px); transition: all 0.3s;">
+        <i class="fas fa-expand fs-4"></i>
+    </button>
+
+    <script>
+        // Logika API Layar Penuh HTML5
+        function toggleFullScreen() {
+            let elem = document.documentElement;
+            let iconBtn = $('#btnFullscreen');
+
+            if (!document.fullscreenElement) {
+                // Masuk ke Fullscreen
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) { /* Safari */
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) { /* IE11 */
+                    elem.msRequestFullscreen();
+                }
+                iconBtn.html('<i class="fas fa-compress fs-4"></i>').css({
+                    'color': '#ef4444', 
+                    'border-color': '#ef4444',
+                    'box-shadow': '0 0 20px rgba(239, 68, 68, 0.5)'
+                });
+            } else {
+                // Keluar dari Fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE11 */
+                    document.msExitFullscreen();
+                }
+                iconBtn.html('<i class="fas fa-expand fs-4"></i>').css({
+                    'color': '#3b82f6', 
+                    'border-color': '#3b82f6',
+                    'box-shadow': '0 0 20px rgba(59, 130, 246, 0.5)'
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>
