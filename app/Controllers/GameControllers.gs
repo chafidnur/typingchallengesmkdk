@@ -109,3 +109,23 @@ function getLeaderboard() {
   // Potong array, kembalikan hanya 10 pemain teratas
   return players.slice(0, 10);
 }
+
+/**
+ * Menarik statistik performa terbaik user untuk diolah pada komponen beranda
+ */
+function getUserStats(kd_user) {
+  const ss = SpreadsheetApp.openById(DB_ID);
+  const sheetUser = ss.getSheetByName("users");
+  if(!sheetUser) return { wpm: 0, acc: 0 };
+
+  const dataUser = sheetUser.getDataRange().getValues();
+  for(let i = 1; i < dataUser.length; i++) {
+    if(dataUser[i][0] === kd_user) {
+      return {
+        wpm: dataUser[i][11] || 0, // Mengambil total_wpm_terbaik dari Kolom L
+        acc: dataUser[i][12] || 0  // Mengambil total_accuracy_terbaik dari Kolom M
+      };
+    }
+  }
+  return { wpm: 0, acc: 0 };
+}

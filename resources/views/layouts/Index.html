@@ -71,20 +71,30 @@
 
     <script>
         function checkDevice() {
+            let appContent = document.getElementById('app-content');
+            let mobileBlocker = document.getElementById('mobileBlocker');
+            
+            // Pengaman: Jika elemen belum dirender, batalkan eksekusi untuk mencegah error "null"
+            if (!appContent || !mobileBlocker) return; 
+            
             let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
             
             if (isMobile) {
-                document.getElementById('app-content').style.display = 'none';
-                document.getElementById('mobileBlocker').classList.remove('d-none');
-                document.getElementById('mobileBlocker').classList.add('d-flex');
+                appContent.style.display = 'none';
+                mobileBlocker.classList.remove('d-none');
+                mobileBlocker.classList.add('d-flex');
             } else {
-                document.getElementById('app-content').style.display = 'block';
-                document.getElementById('mobileBlocker').classList.add('d-none');
-                document.getElementById('mobileBlocker').classList.remove('d-flex');
+                appContent.style.display = 'block';
+                mobileBlocker.classList.add('d-none');
+                mobileBlocker.classList.remove('d-flex');
             }
         }
-        checkDevice();
-        window.addEventListener('resize', checkDevice);
+
+        // Jalankan fungsi HANYA setelah seluruh elemen HTML selesai dimuat dengan sempurna
+        document.addEventListener("DOMContentLoaded", function() {
+            checkDevice();
+            window.addEventListener('resize', checkDevice);
+        });
     </script>
 
 </body>
