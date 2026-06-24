@@ -36,3 +36,38 @@ function simpanUserBaru(dataSiswa) {
   
   // Logika penyimpanan row baru bisa ditambahkan di bawah ini jika diperlukan ke depannya
 }
+
+/**
+ * Mengambil seluruh data siswa untuk ditampilkan di tabel Data Master
+ * @return {Array} Array of Object berisi daftar siswa
+ */
+function getListSiswa() {
+  const ss = SpreadsheetApp.openById(DB_ID);
+  const sheetUser = ss.getSheetByName("users");
+  if (!sheetUser) return [];
+
+  const data = sheetUser.getDataRange().getValues();
+  let listSiswa = [];
+
+  // Looping dari baris 2 (mengabaikan header)
+  for (let i = 1; i < data.length; i++) {
+    // Hanya ambil yang role-nya "SISWA"
+    if (data[i][6] === "SISWA") {
+      listSiswa.push({
+        kd_user: data[i][0],          // Kolom A
+        kelas: data[i][1] || '-',     // Kolom B (fkd_kelas)
+        username: data[i][2],         // Kolom C
+        password: data[i][3],         // Kolom D
+        nis: data[i][4],              // Kolom E
+        nama: data[i][5],             // Kolom F
+        level: data[i][7] || 1,       // Kolom H
+        status: data[i][18] || 'Y'    // Kolom S (status_aktif)
+      });
+    }
+  }
+  
+  // Mengurutkan berdasarkan Nama (Alphabetical)
+  listSiswa.sort((a, b) => a.nama.localeCompare(b.nama));
+  
+  return listSiswa;
+}
