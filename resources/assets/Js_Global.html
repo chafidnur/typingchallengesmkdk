@@ -1,0 +1,37 @@
+<script>
+    // Logika API Layar Penuh HTML5
+    function toggleFullScreen() {
+        let elem = document.documentElement;
+        let iconBtn = $('#btnFullscreen');
+
+        if (!document.fullscreenElement) {
+            // Masuk ke Fullscreen
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+            iconBtn.html('<i class="fas fa-compress fs-4"></i>').css({
+                'color': '#ef4444', 
+                'border-color': '#ef4444',
+                'box-shadow': '0 0 20px rgba(239, 68, 68, 0.5)'
+            });
+        } else {
+            // Keluar dari Fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+            iconBtn.html('<i class="fas fa-expand fs-4"></i>').css({
+                'color': '#3b82f6', 
+                'border-color': '#3b82f6',
+                'box-shadow': '0 0 20px rgba(59, 130, 246, 0.5)'
+            });
+        }
+    }
+</script>

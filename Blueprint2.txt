@@ -1,0 +1,73 @@
+BLUEPRINT 1: Arsitektur File (Google Apps Script)
+Kita akan menggunakan sistem prefix (awalan) nama file untuk mensimulasikan struktur folder.
+1. Backend & Controllers (File .gs)
+Ini adalah "otak" sistem tempat semua logika PHP/MySQL biasanya berada.
+Nama File GAS
+Fungsi & Tanggung Jawab Utama
+Target Database (Sheet)
+Sys_Main.gs
+Pengaturan awal web app, fungsi doGet(), sistem routing HTML, dan fungsi pembantu (seperti format tanggal, kalkulasi WPM standar).
+setting
+API_Auth.gs
+Logika otentikasi, validasi login, manajemen sesi pengguna (Admin/Guru/Siswa), dan rekam jejak login_terakhir.
+users, exp_log
+API_Master.gs
+Operasi CRUD untuk mengelola data dasar sekolah dan bank kalimat. Digunakan utamanya oleh role Admin/Guru.
+tahunajaran, programstudi, kelas, kalimat
+API_User.gs
+Logika pengelolaan profil siswa, penambahan EXP, kenaikan Level, pembukaan Achievement, dan Avatar.
+users, exp_log, achievement, avatar
+API_Game.gs
+Mesin pemroses permainan: menarik kalimat random, menghitung akurasi, menyimpan skor akhir, dan mengelola Hall of Fame.
+score, halloffame
+API_Race.gs
+(Untuk V2.0) Khusus mengelola sistem Semi-live race, sinkronisasi antar siswa setiap 2-3 detik.
+event, room, roomd
+2. Frontend / Views (File .html)
+Ini adalah "wajah" aplikasi yang akan dilihat pengguna (pengganti tag View/HTML biasa).
+Nama File GAS
+Keterangan
+UI_Index.html
+Kerangka dasar SPA (Single Page Application). Hanya berisi tag <head>, pemanggilan library CSS/JS global, dan pembungkus #app-content.
+UI_Login.html
+Tampilan form login bergaya gamified / dark mode.
+UI_Dashboard.html
+Beranda siswa (menampilkan Statistic, Level, dan Menu).
+UI_Typing.html
+Arena utama tes mengetik (text area, live timer, dan live WPM).
+UI_Leaderboard.html
+Tampilan klasemen Ranking Kelas, Sekolah, dan Hall of Fame.
+UI_Admin.html
+Panel khusus guru/admin untuk review AI Bank Kalimat & membuat Event.
+3. Components & Assets (File .html)
+Pecahan kode untuk menjaga agar file UI_ tidak terlalu panjang dan mudah diedit.
+Nama File GAS
+Keterangan
+Comp_Navbar.html
+Potongan kode HTML untuk navigasi atas (Nama user, role, tombol logout).
+Comp_Sidebar.html
+Potongan kode HTML untuk menu samping (jika nanti menggunakan desain AdminLTE utuh).
+Css_Global.html
+Berisi tag <style>. Kumpulan CSS custom (warna neon, glassmorphism, tipografi).
+Js_Global.html
+Berisi tag <script>. Logika routing pindah halaman (loadPage()) dan konfigurasi animasi/SweetAlert.
+BLUEPRINT 2: Struktur Database (Google Sheets)
+Berdasarkan rancangan V1.0 - V2.0 yang Anda susun, berikut adalah peta pengelompokan Sheet agar selaras dengan arsitektur file .gs di atas:
+A. Kelompok Data Master (Dikelola oleh API_Master.gs)
+setting (Variabel global seperti EXP_LOGIN, MAX_LEVEL)
+tahunajaran
+programstudi
+kelas
+kalimat (Bank kalimat dikategorikan per jurusan)
+B. Kelompok Data Pengguna & Gamifikasi (Dikelola oleh API_User.gs)
+6. users (Menyimpan akumulasi total_exp, level, wpm_terbaik)
+7. exp_log (Riwayat perolehan EXP harian)
+8. achievement (Badge Keyboard Rookie, dll)
+9. avatar
+C. Kelompok Transaksi & Riwayat Permainan (Dikelola oleh API_Game.gs)
+10. score (Setiap kali siswa selesai mengetik, masuk sebagai baris baru di sini)
+11. halloffame (Rekapitulasi nilai legenda)
+D. Kelompok Sistem Balapan Live (Dikelola oleh API_Race.gs)
+12. event (Jadwal ujian/kompetisi)
+13. room (Lobi balapan yang dibuat guru)
+14. roomd (Peserta yang sedang mengetik di dalam lobi)
