@@ -71,12 +71,12 @@
     }
     .modal-header { border-bottom: 1px solid #334155; }
     .modal-footer { border-top: 1px solid #334155; }
-    .form-control-dark {
+    .form-control-dark, .form-select-dark {
         background-color: #0f172a;
         border: 1px solid #334155;
         color: white;
     }
-    .form-control-dark:focus {
+    .form-control-dark:focus, .form-select-dark:focus {
         background-color: #0f172a;
         color: white;
         border-color: #3b82f6;
@@ -97,9 +97,10 @@
         </button>
     </div>
 
+    <!-- Sistem Tab -->
     <ul class="nav nav-tabs mb-3" id="masterTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-siswa" type="button" role="tab">Data Siswa</button>
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-user" type="button" role="tab">Data Pengguna</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-kelas" type="button" role="tab">Data Kelas (V1.2)</button>
@@ -110,14 +111,15 @@
     </ul>
 
     <div class="tab-content" id="masterTabsContent">
-        <div class="tab-pane fade show active" id="tab-siswa" role="tabpanel">
+        <!-- TAB 1: DATA PENGGUNA -->
+        <div class="tab-pane fade show active" id="tab-user" role="tabpanel">
             <div class="glass-panel">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div class="w-50">
-                        <input type="text" id="searchSiswa" class="form-control form-control-dark rounded-pill" placeholder="Pencarian Nama / NIS...">
+                        <input type="text" id="searchSiswa" class="form-control form-control-dark rounded-pill" placeholder="Pencarian Nama / NIS / Kelas...">
                     </div>
-                    <button class="btn btn-success rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#modalTambahSiswa">
-                        <i class="fas fa-plus me-2"></i> SISWA BARU
+                    <button class="btn btn-success rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#modalTambahUser">
+                        <i class="fas fa-user-plus me-2"></i> TAMBAH USER
                     </button>
                 </div>
 
@@ -125,11 +127,11 @@
                     <table class="table table-dark-custom w-100" id="tableSiswa">
                         <thead>
                             <tr>
-                                <th>NIS</th>
+                                <th>Role</th>
+                                <th>NIS/NIP</th>
                                 <th>Nama Lengkap</th>
-                                <th>Username</th>
-                                <th>Password</th>
-                                <th>Level</th>
+                                <th>Kelas</th>
+                                <th>Akun Login</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -146,6 +148,7 @@
             </div>
         </div>
 
+        <!-- TAB 2 & 3: PLACEHOLDER -->
         <div class="tab-pane fade" id="tab-kelas" role="tabpanel">
             <div class="glass-panel text-center py-5 text-secondary">
                 <i class="fas fa-tools fa-3x mb-3"></i>
@@ -161,38 +164,64 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalTambahSiswa" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+<!-- MODAL TAMBAH USER -->
+<div class="modal fade" id="modalTambahUser" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content dark-modal">
             <div class="modal-header border-secondary">
-                <h5 class="modal-title fw-bold" style="font-family: 'Orbitron', sans-serif;"><i class="fas fa-user-plus text-success me-2"></i> REGISTRASI SISWA</h5>
+                <h5 class="modal-title fw-bold" style="font-family: 'Orbitron', sans-serif;">
+                    <i class="fas fa-id-card text-success me-2"></i> REGISTRASI PENGGUNA
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="formTambahSiswa">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label text-secondary small">NIS (Nomor Induk Siswa)</label>
-                        <input type="text" class="form-control form-control-dark" id="inNis" required>
-                    </div>
-                    <div class="mb-3">
+            <form id="formTambahUser">
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
                         <label class="form-label text-secondary small">Nama Lengkap</label>
                         <input type="text" class="form-control form-control-dark" id="inNama" required>
                     </div>
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label text-secondary small">Username Login</label>
-                            <input type="text" class="form-control form-control-dark" id="inUsername" required>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label text-secondary small">Password</label>
-                            <input type="text" class="form-control form-control-dark" id="inPassword" required>
-                        </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-secondary small">Role</label>
+                        <select class="form-select form-select-dark" id="inRole" required>
+                            <option value="SISWA">Siswa</option>
+                            <option value="GURU">Guru</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
                     </div>
-                    <input type="hidden" id="inKelas" value="KLS-DEFAULT">
+                    <div class="col-md-3">
+                        <label class="form-label text-secondary small">Status Aktif</label>
+                        <select class="form-select form-select-dark" id="inStatus" required>
+                            <option value="Y">Aktif</option>
+                            <option value="N">Nonaktif</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small">NIS / NIP</label>
+                        <input type="text" class="form-control form-control-dark" id="inNis" placeholder="Isi - jika tidak ada">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small">Kode Kelas</label>
+                        <input type="text" class="form-control form-control-dark" id="inKelas" placeholder="Contoh: KLS-X-TKJ1">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small">Username Login</label>
+                        <input type="text" class="form-control form-control-dark" id="inUsername" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small">Password</label>
+                        <input type="text" class="form-control form-control-dark" id="inPassword" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small">Tahun Lulus (Khusus Siswa)</label>
+                        <input type="text" class="form-control form-control-dark" id="inTahunLulus" placeholder="Contoh: 2026">
+                    </div>
                 </div>
                 <div class="modal-footer border-secondary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success fw-bold" id="btnSimpanSiswa">
+                    <button type="submit" class="btn btn-success fw-bold" id="btnSimpanUser">
                         <span id="spinSimpan" class="spinner-border spinner-border-sm d-none me-1" role="status"></span>
                         SIMPAN DATA
                     </button>
@@ -210,17 +239,22 @@
                 .withSuccessHandler(function(data) {
                     let html = '';
                     if(data.length === 0) {
-                        html = '<tr><td colspan="6" class="text-center text-secondary py-4">Belum ada data siswa.</td></tr>';
+                        html = '<tr><td colspan="6" class="text-center text-secondary py-4">Belum ada data pengguna.</td></tr>';
                     } else {
                         data.forEach(s => {
                             let statusBadge = s.status === 'Y' ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Nonaktif</span>';
+                            let roleBadge = s.role === 'SISWA' ? '<span class="badge bg-primary">SISWA</span>' : `<span class="badge bg-warning text-dark">${s.role}</span>`;
+                            
                             html += `
                                 <tr class="baris-siswa">
+                                    <td>${roleBadge}</td>
                                     <td class="kolom-pencarian fw-bold text-info">${s.nis}</td>
                                     <td class="kolom-pencarian">${s.nama}</td>
-                                    <td><span class="text-secondary"><i class="fas fa-user-ninja me-1"></i>${s.username}</span></td>
-                                    <td><span class="text-secondary"><i class="fas fa-key me-1"></i>${s.password}</span></td>
-                                    <td><span class="badge bg-primary">Lv ${s.level}</span></td>
+                                    <td class="kolom-pencarian">${s.kelas}</td>
+                                    <td>
+                                        <div class="small text-secondary"><i class="fas fa-user-ninja me-1"></i> ${s.username}</div>
+                                        <div class="small text-secondary"><i class="fas fa-key me-1"></i> ${s.password}</div>
+                                    </td>
                                     <td>${statusBadge}</td>
                                 </tr>
                             `;
@@ -234,52 +268,55 @@
                 .getListSiswa();
         }
 
-        // Panggil fungsi muat tabel saat halaman pertama kali dibuka
+        // Panggil fungsi muat tabel saat halaman dibuka
         muatTabelSiswa();
 
-        // 2. Logika Live Search (Pencarian Nama/NIS)
+        // 2. Logika Live Search (Pencarian)
         $('#searchSiswa').on('keyup', function() {
             let keyword = $(this).val().toLowerCase();
             $('.baris-siswa').filter(function() {
-                // Mencari teks gabungan dari baris tersebut (NIS & Nama)
                 $(this).toggle($(this).text().toLowerCase().indexOf(keyword) > -1);
             });
         });
 
-        // 3. Logika Submit Form Tambah Siswa
-        $('#formTambahSiswa').on('submit', function(e) {
+        // 3. Logika Submit Form Tambah User
+        $('#formTambahUser').on('submit', function(e) {
             e.preventDefault();
             
-            // Menonaktifkan tombol agar tidak di-klik dobel
-            $('#btnSimpanSiswa').prop('disabled', true);
+            $('#btnSimpanUser').prop('disabled', true);
             $('#spinSimpan').removeClass('d-none');
 
-            // Mengumpulkan data dari form
+            // Ambil nama pembuat dari LocalStorage (Admin yang sedang login)
+            let creatorName = localStorage.getItem('nama_user') || 'ADMIN_SISTEM';
+
+            // Mengumpulkan data lengkap sesuai form
             let dataSiswaBaru = {
-                nis: $('#inNis').val(),
                 nama: $('#inNama').val(),
+                role: $('#inRole').val(),
+                status_aktif: $('#inStatus').val(),
+                nis: $('#inNis').val(),
+                fkd_kelas: $('#inKelas').val(),
                 username: $('#inUsername').val(),
                 password: $('#inPassword').val(),
-                fkd_kelas: $('#inKelas').val()
+                tahun_lulus: $('#inTahunLulus').val(),
+                created_by: creatorName
             };
 
-            // Mengirim data ke API MasterController.gs
+            // Kirim ke API MasterController.gs
             google.script.run
                 .withSuccessHandler(function(response) {
-                    $('#btnSimpanSiswa').prop('disabled', false);
+                    $('#btnSimpanUser').prop('disabled', false);
                     $('#spinSimpan').addClass('d-none');
                     
                     if(response.status === 'success') {
-                        // Tutup modal dan bersihkan form
-                        $('#modalTambahSiswa').modal('hide');
-                        $('#formTambahSiswa')[0].reset();
+                        $('#modalTambahUser').modal('hide');
+                        $('#formTambahUser')[0].reset();
                         
                         Swal.fire({
                             icon: 'success', title: 'BERHASIL', text: response.message, 
                             background: '#1e293b', color: '#fff', showConfirmButton: false, timer: 1500
                         });
                         
-                        // Muat ulang tabel agar data baru muncul
                         $('#bodyTableSiswa').html('<tr><td colspan="6" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>');
                         muatTabelSiswa();
                     } else {
@@ -287,7 +324,7 @@
                     }
                 })
                 .withFailureHandler(function(err) {
-                    $('#btnSimpanSiswa').prop('disabled', false);
+                    $('#btnSimpanUser').prop('disabled', false);
                     $('#spinSimpan').addClass('d-none');
                     Swal.fire({ icon: 'error', title: 'SERVER ERROR', text: err.message, background: '#1e293b', color: '#fff' });
                 })
