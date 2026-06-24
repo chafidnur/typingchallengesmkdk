@@ -150,6 +150,27 @@
         transform: translateY(-3px);
         box-shadow: 0 10px 25px rgba(139, 92, 246, 0.5);
     }
+
+    /* CSS Tambahan Tombol Leaderboard */
+    .btn-neon-gold {
+        background: transparent;
+        color: #fbbf24;
+        border: 2px solid #fbbf24;
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+    }
+    .btn-neon-gold:hover {
+        background: rgba(251, 191, 36, 0.1);
+        box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+    }
 </style>
 
 <div class="gamified-login-wrapper">
@@ -180,7 +201,12 @@
                 <span id="loginSpinner" class="spinner-border spinner-border-sm d-none me-2" role="status"></span>
                 <span id="btnText">START GAME</span>
             </button>
+            
+            <button type="button" class="btn-neon-gold" onclick="loadPage('Leaderboard')">
+                <i class="fas fa-trophy me-2"></i> HALL OF FAME
+            </button>
         </form>
+
         <div class="mt-4 text-center">
             <a href="#" id="btnLupaPassword" class="text-secondary" style="text-decoration: none; font-size: 0.9rem;">
                 <i class="fas fa-question-circle me-1"></i> Akses Ditolak / Lupa Password?

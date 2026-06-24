@@ -43,31 +43,40 @@
             <h2 class="fw-bold" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">
                 <i class="fas fa-trophy text-warning me-2"></i> HALL OF FAME
             </h2>
-            <p class="text-secondary mb-0">Top 10 Typist Tercepat Sekolah</p>
+            <p class="text-secondary mb-0">Top 10 Typist Tercepat SMK Duta Karya</p>
         </div>
-        <button class="btn btn-outline-secondary rounded-pill" onclick="loadPage('Dashboard')">
+        <button class="btn btn-outline-secondary rounded-pill fw-bold" onclick="kembaliDariLeaderboard()">
             <i class="fas fa-arrow-left me-2"></i> KEMBALI
         </button>
     </div>
 
     <div id="leaderboardContainer">
-        <!-- Tampilan Loading -->
         <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-3 text-secondary">Menarik data dari server utama...</p>
+            <p class="mt-3 text-secondary">Menarik data klasemen dari server...</p>
         </div>
     </div>
 </div>
 
 <script>
+// Fungsi deteksi arah balik (Apakah kembali ke Login atau ke Dashboard)
+function kembaliDariLeaderboard() {
+    let adaSesiUser = localStorage.getItem('kd_user');
+    if(adaSesiUser) {
+        loadPage('Dashboard');
+    } else {
+        loadPage('Login');
+    }
+}
+
 $(document).ready(function() {
-    // Meminta data klasemen dari backend
+    // Meminta data dari Controller Backend
     google.script.run
         .withSuccessHandler(function(players) {
             let html = "";
             
             if(players.length === 0) {
-                html = `<div class="alert alert-dark text-center border-secondary">Belum ada data permainan yang terekam.</div>`;
+                html = `<div class="alert alert-dark text-center border-secondary">Belum ada data kecepatan yang terekam di sistem.</div>`;
             } else {
                 players.forEach((p, index) => {
                     let rankClass = index < 3 ? `rank-${index + 1}` : '';
@@ -90,7 +99,7 @@ $(document).ready(function() {
             $('#leaderboardContainer').html(html);
         })
         .withFailureHandler(function(err) {
-            $('#leaderboardContainer').html(`<div class="alert alert-danger text-center">Gagal memuat data klasemen: ${err.message}</div>`);
+            $('#leaderboardContainer').html(`<div class="alert alert-danger text-center">Gagal terhubung ke database. Coba lagi nanti.</div>`);
         })
         .getLeaderboard();
 });

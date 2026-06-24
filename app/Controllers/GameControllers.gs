@@ -129,3 +129,33 @@ function getUserStats(kd_user) {
   }
   return { wpm: 0, acc: 0 };
 }
+
+/**
+ * Mengambil daftar Top 10 Pemain berdasarkan WPM Terbaik untuk Leaderboard
+ */
+function getLeaderboard() {
+  const ss = SpreadsheetApp.openById(DB_ID);
+  const sheetUser = ss.getSheetByName("users");
+  if (!sheetUser) return [];
+
+  const data = sheetUser.getDataRange().getValues();
+  let players = [];
+
+  for (let i = 1; i < data.length; i++) {
+    // Pastikan hanya siswa yang dihitung (Abaikan skor Admin/Guru)
+    if (data[i][6] === "SISWA") { 
+      players.push({
+        nama: data[i][5],             // Kolom F: Nama
+        level: data[i][7] || 1,       // Kolom H: Level
+        wpm: data[i][11] || 0,        // Kolom L: total_wpm_terbaik
+        acc: data[i][12] || 0         // Kolom M: total_accuracy_terbaik
+      });
+    }
+  }
+
+  // Mengurutkan array dari yang tertinggi (Descending) berdasarkan WPM
+  players.sort((a, b) => b.wpm - a.wpm);
+
+  // Ambil 10 teratas
+  return players.slice(0, 10);
+}
