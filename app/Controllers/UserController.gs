@@ -1,8 +1,3 @@
-/**
- * Mengambil profil lengkap siswa untuk ditampilkan di antarmuka Dashboard
- * @param {string} kd_user - Kode unik pengguna (Primary Key)
- * @return {Object|null} Data profil pengguna atau null jika tidak ditemukan
- */
 function getProfilSiswa(kd_user) {
   const ss = SpreadsheetApp.openById(DB_ID);
   const sheetUser = ss.getSheetByName("users");
@@ -11,17 +6,16 @@ function getProfilSiswa(kd_user) {
   
   const dataUser = sheetUser.getDataRange().getValues();
   
-  // Mencari data user berdasarkan kd_user (baris demi baris, melewati header)
   for(let i = 1; i < dataUser.length; i++) {
     if(dataUser[i][0] === kd_user) {
       return {
-        kd_user: dataUser[i][0],      // Kolom A
-        nama: dataUser[i][5],         // Kolom F
-        role: dataUser[i][6],         // Kolom G
-        level: dataUser[i][7] || 1,   // Kolom H: Level saat ini
-        exp: dataUser[i][8] || 0,     // Kolom I: EXP berjalan
-        total_exp: dataUser[i][9]|| 0,// Kolom J: Akumulasi EXP
-        gelar: dataUser[i][15] || '-' // Kolom P: Gelar/Achievement yang dipakai
+        kd_user: dataUser[i][0],      
+        nama: dataUser[i][5],         
+        role: dataUser[i][6],         
+        level: dataUser[i][7] || 1,   
+        exp: dataUser[i][8] || 0,     
+        total_exp: dataUser[i][9]|| 0,
+        gelar: dataUser[i][14] || '-' // PERBAIKAN: Indeks 14 untuk Gelar
       };
     }
   }

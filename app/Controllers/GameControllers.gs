@@ -150,7 +150,7 @@ function getLeaderboard() {
         level: data[i][7] || 1,       // Kolom H: Level
         wpm: data[i][11] || 0,        // Kolom L: total_wpm_terbaik
         acc: data[i][12] || 0,        // Kolom M: total_accuracy_terbaik
-        gelar: data[i][15] || '-'     // Kolom P: Gelar/Achievement
+        gelar: data[i][14] || '-'     // Kolom P: Gelar/Achievement
       });
     }
   }
