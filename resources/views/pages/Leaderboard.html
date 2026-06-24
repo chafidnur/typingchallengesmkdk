@@ -59,7 +59,7 @@
 </div>
 
 <script>
-// Fungsi deteksi arah balik (Apakah kembali ke Login atau ke Dashboard)
+// Fungsi deteksi arah balik
 function kembaliDariLeaderboard() {
     let adaSesiUser = localStorage.getItem('kd_user');
     if(adaSesiUser) {
@@ -82,12 +82,21 @@ $(document).ready(function() {
                     let rankClass = index < 3 ? `rank-${index + 1}` : '';
                     let trophyIcon = index === 0 ? `<i class="fas fa-crown text-warning me-2"></i>` : '';
                     
+                    // Logika memunculkan Gelar jika ada
+                    let badgeGelar = "";
+                    if (p.gelar && p.gelar !== "-" && p.gelar.trim() !== "") {
+                        badgeGelar = `<span class="badge bg-warning text-dark rounded-pill mt-1 ms-2" style="font-size: 0.75rem;"><i class="fas fa-star me-1"></i>${p.gelar}</span>`;
+                    }
+                    
                     html += `
                     <div class="rank-card ${rankClass}">
                         <div class="rank-number">#${index + 1}</div>
                         <div class="rank-details">
                             <h4 class="mb-0 fw-bold">${trophyIcon}${p.nama}</h4>
-                            <span class="badge bg-primary rounded-pill mt-1">Level ${p.level}</span>
+                            <div>
+                                <span class="badge bg-primary rounded-pill mt-1">Level ${p.level}</span>
+                                ${badgeGelar}
+                            </div>
                         </div>
                         <div class="rank-stats">
                             <div class="fs-4 fw-bold text-info">${p.wpm} <span class="fs-6 text-secondary">WPM</span></div>

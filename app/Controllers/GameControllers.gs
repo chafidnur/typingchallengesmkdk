@@ -132,6 +132,7 @@ function getUserStats(kd_user) {
 
 /**
  * Mengambil daftar Top 10 Pemain berdasarkan WPM Terbaik untuk Leaderboard
+ * (Sudah dilengkapi dengan Gelar/Achievement)
  */
 function getLeaderboard() {
   const ss = SpreadsheetApp.openById(DB_ID);
@@ -142,13 +143,14 @@ function getLeaderboard() {
   let players = [];
 
   for (let i = 1; i < data.length; i++) {
-    // Pastikan hanya siswa yang dihitung (Abaikan skor Admin/Guru)
+    // Pastikan hanya siswa yang dihitung
     if (data[i][6] === "SISWA") { 
       players.push({
         nama: data[i][5],             // Kolom F: Nama
         level: data[i][7] || 1,       // Kolom H: Level
         wpm: data[i][11] || 0,        // Kolom L: total_wpm_terbaik
-        acc: data[i][12] || 0         // Kolom M: total_accuracy_terbaik
+        acc: data[i][12] || 0,        // Kolom M: total_accuracy_terbaik
+        gelar: data[i][15] || '-'     // Kolom P: Gelar/Achievement
       });
     }
   }
