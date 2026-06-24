@@ -118,56 +118,78 @@ function getListSiswa() {
 }
 
 /**
- * Mengambil detail profil dan riwayat latihan siswa dari Sheet Score
+ * Mengambil detail profil dan riwayat latihan siswa dari Sheet 'score'
+ * Dibentengi dengan Try-Catch dan pemaksaan tipe String agar tidak error.
  */
 function getRiwayatSiswa(kd_user) {
-  const ss = SpreadsheetApp.openById(DB_ID);
-  
-  // 1. Tarik Data Profil
-  const sheetUser = ss.getSheetByName("users");
-  let detailUser = null;
-  if(sheetUser) {
+  try {
+    const ss = SpreadsheetApp.openById(DB_ID);
+    // Paksa menjadi string dan bersihkan spasi agar perbandingan 100% akurat
+    const targetKd = String(kd_user).trim(); 
+
+    // ============================================
+    // 1. TARIK DATA PROFIL DARI SHEET 'users'
+    // ============================================
+    const sheetUser = ss.getSheetByName("users");
+    if (!sheetUser) return { status: "error", message: "Sheet 'users' belum ada di Spreadsheet." };
+
+    let detailUser = null;
     const dataUser = sheetUser.getDataRange().getValues();
+    
+    // Loop cari profil siswa
     for(let i = 1; i < dataUser.length; i++) {
-      if(dataUser[i][0] === kd_user) {
+      if(String(dataUser[i][0]).trim() === targetKd) {
         detailUser = {
-          nama: dataUser[i][5],
-          nis: dataUser[i][4],
-          kelas: dataUser[i][1],
-          level: dataUser[i][7],
-          wpm_terbaik: dataUser[i][11],
-          acc_terbaik: dataUser[i][12],
-          gelar: dataUser[i][14]
+          nama: dataUser[i][5] || "Tanpa Nama", // Indeks 5: nama
+          nis: dataUser[i][4] || "-",           // Indeks 4: nis
+          kelas: dataUser[i][1] || "-",         // Indeks 1: fkd_kelas
+          level: dataUser[i][7] || 1,           // Indeks 7: level
+          wpm_terbaik: dataUser[i][11] || 0,    // Indeks 11: total_wpm_terbaik
+          acc_terbaik: dataUser[i][12] || 0,    // Indeks 12: total_accuracy_terbaik
+          gelar: dataUser[i][14] || "-"         // Indeks 14: gelar
         };
         break;
       }
     }
-  }
 
-  // 2. Tarik Riwayat Main (Score)
-  const sheetScore = ss.getSheetByName("score");
-  let riwayat = [];
-  if(sheetScore) {
-    const dataScore = sheetScore.getDataRange().getValues();
-    for(let i = 1; i < dataScore.length; i++) {
-      if(dataScore[i][1] === kd_user) { // fkd_user ada di indeks 1
-        riwayat.push({
-          wpm: dataScore[i][3],       // wpm
-          acc: dataScore[i][4],       // accuracy
-          salah: dataScore[i][6],     // total_salah
-          durasi: dataScore[i][7],    // durasi_detik
-          tanggal: dataScore[i][13]   // tanggal_main
-        });
+    if (!detailUser) return { status: "error", message: "Profil siswa tidak ditemukan di database." };
+
+    // ============================================
+    // 2. TARIK DATA LATIHAN DARI SHEET 'score'
+    // ============================================
+    const sheetScore = ss.getSheetByName("score");
+    let riwayat = [];
+    
+    // Pastikan sheetScore ada dan datanya lebih dari 1 baris (header)
+    if(sheetScore && sheetScore.getLastRow() > 1) {
+      const dataScore = sheetScore.getDataRange().getValues();
+      for(let i = 1; i < dataScore.length; i++) {
+        // Cek fkd_user di Indeks 1
+        if(String(dataScore[i][1]).trim() === targetKd) {
+          riwayat.push({
+            wpm: dataScore[i][3] || 0,          // Indeks 3: wpm
+            acc: dataScore[i][4] || 0,          // Indeks 4: accuracy
+            salah: dataScore[i][6] || 0,        // Indeks 6: total_salah
+            durasi: dataScore[i][7] || 0,       // Indeks 7: durasi_detik
+            tanggal: dataScore[i][13] || new Date() // Indeks 13: tgl_main
+          });
+        }
       }
     }
+
+    // Urutkan riwayat dari yang paling baru (Descending)
+    riwayat.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+
+    // Kirim balikan sukses
+    return {
+      status: "success",
+      detail: detailUser,
+      history: riwayat,
+      total_main: riwayat.length
+    };
+
+  } catch(e) {
+    // Jika ada error internal, kirim pesan error agar tidak stuck loading
+    return { status: "error", message: "Sistem gagal membaca data: " + e.message };
   }
-
-  // Urutkan riwayat dari yang paling baru
-  riwayat.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
-
-  return {
-    detail: detailUser,
-    history: riwayat,
-    total_main: riwayat.length
-  };
 }
