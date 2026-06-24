@@ -83,7 +83,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stat-card" onclick="loadPage('Leaderboard')" style="cursor: pointer;" title="Lihat Klasemen">
+                <div class="stat-card">
                     <p class="text-secondary mb-0 fw-bold" style="letter-spacing: 2px;">BANK KALIMAT</p>
                     <div class="stat-value text-glow-green">-</div>
                     <small class="text-secondary">Soal Tersedia</small>
@@ -164,7 +164,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stat-card">
+                <div class="stat-card" onclick="loadPage('Leaderboard')" style="cursor: pointer;" title="Lihat Klasemen Sekolah">
                     <p class="text-secondary mb-0 fw-bold" style="letter-spacing: 2px;">RANK (V1.1)</p>
                     <div class="stat-value text-glow-gold">Unranked</div>
                     <small class="text-secondary">Posisi di Sekolah</small>
@@ -202,7 +202,9 @@
 </div>
 
 <script>
-   $(document).ready(function() {
+    // PERBAIKAN: Menghapus $(document).ready() dan menggantinya dengan eksekusi fungsi langsung 
+    // agar SPA jQuery tidak mengabaikan pembacaan elemen.
+    (function initDashboard() {
         let namaPlayer = localStorage.getItem('nama_user');
         let rolePlayer = localStorage.getItem('role_user');
         let kdPlayer = localStorage.getItem('kd_user'); 
@@ -218,6 +220,7 @@
                 .getUserStats(kdPlayer);
         }
         
+        // Logika kemunculan panel berdasarkan Role User
         if(rolePlayer === 'ADMIN' || rolePlayer === 'GURU') {
             $('#dashboardTitle').html('<i class="fas fa-terminal text-success me-2"></i> SYSTEM COMMAND');
             $('#dashRoleBadge').text(rolePlayer).addClass('bg-success').removeClass('bg-secondary');
@@ -227,7 +230,7 @@
             $('#dashRoleBadge').text('SISWA').addClass('bg-primary').removeClass('bg-secondary');
             $('#panelSiswa').removeClass('d-none');
         }
-    });
+    })(); // Kurung ini akan langsung mengeksekusi fungsi di atas saat halaman diload
 
     function logoutSistem() {
         Swal.fire({
