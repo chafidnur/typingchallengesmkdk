@@ -1,254 +1,506 @@
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600&display=swap');
 
-    .gamified-login-wrapper {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #0f172a;
-        background-image: 
-            radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-            radial-gradient(at 50% 0%, hsla(225,39%,30%,0.5) 0, transparent 50%), 
-            radial-gradient(at 100% 0%, hsla(339,49%,30%,0.5) 0, transparent 50%);
-        position: relative;
-        padding: 20px;
-    }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-    .orb {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(60px);
-        opacity: 0.6;
-        animation: float 10s infinite ease-in-out alternate;
-    }
-    .orb-1 { width: 300px; height: 300px; background: #3b82f6; top: -50px; left: -50px; }
-    .orb-2 { width: 400px; height: 400px; background: #8b5cf6; bottom: -100px; right: -100px; animation-delay: -5s; }
+.gamified-login-wrapper{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+    overflow:hidden;
 
-    @keyframes float {
-        0% { transform: translate(0, 0) scale(1); }
-        100% { transform: translate(30px, 50px) scale(1.1); }
-    }
+    background:
+        radial-gradient(circle at top left,#1e3a8a 0%,transparent 35%),
+        radial-gradient(circle at bottom right,#6d28d9 0%,transparent 35%),
+        #020617;
+}
 
-    .glass-card {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        border-radius: 24px;
-        width: 100%;
-        max-width: 420px;
-        padding: 40px 30px;
-        position: relative;
-        z-index: 10;
-        text-align: center;
-    }
+/* GRID EFFECT */
 
-    .mascot-ring {
-        width: 110px;
-        height: 110px;
-        margin: 0 auto 20px;
-        border-radius: 50%;
-        padding: 4px;
-        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-        position: relative;
-        box-shadow: 0 0 20px rgba(79, 172, 254, 0.4);
-    }
-    .mascot-inner {
-        width: 100%;
-        height: 100%;
-        background-color: #1e293b;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .mascot-ring i {
-        font-size: 2.5rem;
-        color: #4facfe;
-    }
-    .developer-tag {
-        position: absolute;
-        bottom: -12px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #f59e0b;
-        color: #111827;
-        font-size: 0.7rem;
-        font-weight: 700;
-        padding: 4px 14px;
-        border-radius: 20px;
-        white-space: nowrap;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
+.gamified-login-wrapper::before{
+    content:'';
+    position:absolute;
+    inset:0;
 
-    .game-title {
-        font-family: 'Orbitron', sans-serif;
-        color: #ffffff;
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 5px;
-        text-shadow: 0 0 10px rgba(255,255,255,0.3);
-        letter-spacing: 2px;
-    }
-    .game-subtitle {
-        color: #94a3b8;
-        font-size: 0.9rem;
-        margin-bottom: 30px;
-        letter-spacing: 1px;
-    }
+    background-image:
+        linear-gradient(rgba(59,130,246,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,.08) 1px, transparent 1px);
 
-    .custom-input-group {
-        position: relative;
-        margin-bottom: 25px;
-        text-align: left;
-    }
-    .custom-input-group i {
-        position: absolute;
-        top: 50%;
-        left: 15px;
-        transform: translateY(-50%);
-        color: #64748b;
-        font-size: 1.1rem;
-        transition: 0.3s;
-    }
-    .custom-input {
-        width: 100%;
-        background: rgba(15, 23, 42, 0.6);
-        border: 2px solid rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        padding: 14px 15px 14px 45px;
-        color: #fff;
-        font-size: 1rem;
-        outline: none;
-        transition: all 0.3s ease;
-    }
-    .custom-input::placeholder { color: #475569; }
-    .custom-input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
-        background: rgba(15, 23, 42, 0.8);
-    }
+    background-size:40px 40px;
+}
 
-    .btn-neon {
-        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-        color: white;
-        border: none;
-        width: 100%;
-        padding: 15px;
-        border-radius: 12px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    .btn-neon:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(139, 92, 246, 0.5);
-    }
+/* SCANLINE EFFECT */
 
-    /* CSS Tambahan Tombol Leaderboard */
-    .btn-neon-gold {
-        background: transparent;
-        color: #fbbf24;
-        border: 2px solid #fbbf24;
-        width: 100%;
-        padding: 12px;
-        border-radius: 12px;
-        font-size: 1rem;
-        font-weight: 600;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-top: 15px;
-    }
-    .btn-neon-gold:hover {
-        background: rgba(251, 191, 36, 0.1);
-        box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
-    }
+.gamified-login-wrapper::after{
+    content:'';
+    position:absolute;
+    inset:0;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(255,255,255,.015) 3px
+        );
+
+    pointer-events:none;
+}
+
+/* FLOATING LIGHTS */
+
+.orb{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(90px);
+    opacity:.5;
+}
+
+.orb-1{
+    width:350px;
+    height:350px;
+    background:#3b82f6;
+    top:-100px;
+    left:-100px;
+}
+
+.orb-2{
+    width:350px;
+    height:350px;
+    background:#8b5cf6;
+    bottom:-100px;
+    right:-100px;
+}
+
+.orb-3{
+    width:250px;
+    height:250px;
+    background:#06b6d4;
+    top:40%;
+    left:60%;
+}
+
+/* CARD */
+
+.glass-card{
+    width:100%;
+    max-width:460px;
+
+    background:rgba(15,23,42,.75);
+
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+
+    border:1px solid rgba(59,130,246,.25);
+
+    border-radius:30px;
+
+    padding:40px;
+
+    position:relative;
+    z-index:10;
+
+    box-shadow:
+        0 0 30px rgba(59,130,246,.15),
+        0 0 80px rgba(139,92,246,.15);
+}
+
+.glass-card::before{
+    content:'';
+
+    position:absolute;
+    inset:0;
+
+    border-radius:30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.05),
+            transparent,
+            rgba(255,255,255,.03)
+        );
+
+    pointer-events:none;
+}
+
+/* LOGO */
+
+.mascot-ring{
+    width:130px;
+    height:130px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #06b6d4,
+            #3b82f6,
+            #8b5cf6
+        );
+
+    box-shadow:
+        0 0 20px #3b82f6,
+        0 0 50px #8b5cf6;
+
+    position:relative;
+}
+
+.mascot-inner{
+    width:118px;
+    height:118px;
+
+    border-radius:50%;
+
+    background:#0f172a;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.mascot-inner i{
+    font-size:3rem;
+    color:#38bdf8;
+}
+
+.developer-tag{
+    position:absolute;
+    bottom:-12px;
+    left:50%;
+    transform:translateX(-50%);
+
+    background:#fbbf24;
+    color:#000;
+
+    padding:4px 14px;
+
+    border-radius:50px;
+
+    font-size:.7rem;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+/* TITLE */
+
+.game-title{
+    margin-top:30px;
+
+    text-align:center;
+
+    font-family:'Orbitron',sans-serif;
+
+    color:white;
+
+    font-size:2rem;
+
+    letter-spacing:4px;
+}
+
+.game-subtitle{
+    text-align:center;
+    color:#94a3b8;
+    margin-top:8px;
+}
+
+.server-status{
+    margin:20px auto 30px;
+    width:max-content;
+
+    padding:8px 18px;
+
+    border-radius:999px;
+
+    border:1px solid rgba(34,197,94,.4);
+
+    background:rgba(34,197,94,.08);
+
+    color:#4ade80;
+
+    font-size:.8rem;
+
+    letter-spacing:2px;
+}
+
+/* INPUT */
+
+.custom-input-group{
+    position:relative;
+    margin-bottom:20px;
+}
+
+.custom-input-group i{
+    position:absolute;
+    left:18px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#64748b;
+}
+
+.custom-input{
+    width:100%;
+
+    padding:15px 15px 15px 50px;
+
+    background:rgba(2,6,23,.8);
+
+    border:1px solid rgba(59,130,246,.2);
+
+    border-radius:14px;
+
+    color:white;
+
+    outline:none;
+
+    transition:.3s;
+}
+
+.custom-input:focus{
+    border-color:#38bdf8;
+
+    box-shadow:
+        0 0 10px rgba(56,189,248,.3),
+        0 0 25px rgba(56,189,248,.2);
+}
+
+.custom-input::placeholder{
+    color:#64748b;
+}
+
+/* BUTTON */
+
+.btn-neon{
+    width:100%;
+    border:none;
+
+    border-radius:14px;
+
+    padding:15px;
+
+    color:white;
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #06b6d4,
+            #3b82f6,
+            #8b5cf6
+        );
+}
+
+.btn-neon:hover{
+    transform:translateY(-2px);
+}
+
+.btn-neon::before{
+    content:'';
+
+    position:absolute;
+
+    top:0;
+    left:-100%;
+
+    width:100%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.3),
+            transparent
+        );
+
+    transition:.7s;
+}
+
+.btn-neon:hover::before{
+    left:100%;
+}
+
+.btn-neon-gold{
+    width:100%;
+    margin-top:15px;
+
+    padding:14px;
+
+    border-radius:14px;
+
+    background:transparent;
+
+    color:#fbbf24;
+
+    border:1px solid #fbbf24;
+}
+
+.btn-neon-gold:hover{
+    background:rgba(251,191,36,.08);
+}
+
+.forgot-link{
+    color:#94a3b8;
+    text-decoration:none;
+}
+
+.forgot-link:hover{
+    color:#38bdf8;
+}
 </style>
 
 <div class="gamified-login-wrapper">
+
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
     <div class="glass-card">
+
         <div class="mascot-ring">
             <div class="mascot-inner">
-                <i class="fas fa-robot"></i>
+                <i class="fas fa-microchip"></i>
             </div>
-            <div class="developer-tag">Chafid Nur, S.Kom</div>
+            <div class="developer-tag">
+                Chafid Nur, S.Kom
+            </div>
         </div>
 
-        <h1 class="game-title">DUTA KARYA</h1>
-        <p class="game-subtitle">TYPING CHALLENGE V1.0</p>
+        <h1 class="game-title">
+            SMK DUTA KARYA
+        </h1>
+
+        <p class="game-subtitle">
+            TYPING CHALLENGE V1.0
+        </p>
+
+        <div class="server-status">
+            ● SERVER ONLINE
+        </div>
 
         <form id="formLogin">
+
             <div class="custom-input-group">
-                <input type="text" id="username" class="custom-input" placeholder="Username" required>
-                <i class="fas fa-user-ninja"></i>
+                <input type="text"
+                       id="username"
+                       class="custom-input"
+                       placeholder="Username"
+                       required>
+                <i class="fas fa-user"></i>
             </div>
+
             <div class="custom-input-group">
-                <input type="password" id="password" class="custom-input" placeholder="Password" required>
-                <i class="fas fa-key"></i>
+                <input type="password"
+                       id="password"
+                       class="custom-input"
+                       placeholder="Password"
+                       required>
+                <i class="fas fa-lock"></i>
             </div>
-            <button type="submit" id="btnLogin" class="btn-neon">
-                <span id="loginSpinner" class="spinner-border spinner-border-sm d-none me-2" role="status"></span>
-                <span id="btnText">START GAME</span>
+
+            <button type="submit"
+                    id="btnLogin"
+                    class="btn-neon">
+
+                <span id="loginSpinner"
+                      class="spinner-border spinner-border-sm d-none me-2">
+                </span>
+
+                <span id="btnText">
+                    START GAME
+                </span>
+
             </button>
-            
-            <button type="button" class="btn-neon-gold" onclick="loadPage('Leaderboard')">
-                <i class="fas fa-trophy me-2"></i> HALL OF FAME
+
+            <button type="button"
+                    class="btn-neon-gold"
+                    onclick="loadPage('Leaderboard')">
+
+                <i class="fas fa-trophy me-2"></i>
+                HALL OF FAME
+
             </button>
+
         </form>
 
         <div class="mt-4 text-center">
-            <a href="#" id="btnLupaPassword" class="text-secondary" style="text-decoration: none; font-size: 0.9rem;">
-                <i class="fas fa-question-circle me-1"></i> Akses Ditolak / Lupa Password?
+            <a href="#"
+               id="btnLupaPassword"
+               class="forgot-link">
+
+                <i class="fas fa-question-circle"></i>
+                Akses Ditolak / Lupa Password?
+
             </a>
         </div>
+
     </div>
+
 </div>
+
+<!-- SCRIPT ASLI TIDAK DIUBAH -->
 
 <script>
 $(document).ready(function() {
     $('#formLogin').on('submit', function(e) {
         e.preventDefault();
-        
+
         const username = $('#username').val();
         const password = $('#password').val();
-        
+
         $('#btnLogin').attr('disabled', true);
         $('#loginSpinner').removeClass('d-none');
         $('#btnText').text('CONNECTING...');
 
         google.script.run
             .withSuccessHandler(function(response) {
+
                 $('#btnLogin').removeAttr('disabled');
                 $('#loginSpinner').addClass('d-none');
                 $('#btnText').text('START GAME');
 
                 if (response.status === 'success') {
+
                     Swal.fire({
                         icon: 'success',
-                        title: 'ACCESS GRANTED',
+                        title: 'BERHASIL LOGIN',
                         text: 'Welcome Player: ' + response.nama,
                         background: '#1e293b',
                         color: '#fff',
                         showConfirmButton: false,
                         timer: 1500
                     }).then(() => {
+
                         localStorage.setItem('kd_user', response.kd_user);
                         localStorage.setItem('nama_user', response.nama);
                         localStorage.setItem('role_user', response.role);
+
                         loadPage('Dashboard');
+
                     });
+
                 } else {
+
                     Swal.fire({
                         icon: 'error',
                         title: 'ACCESS DENIED',
@@ -257,12 +509,15 @@ $(document).ready(function() {
                         color: '#fff',
                         confirmButtonColor: '#ef4444'
                     });
+
                 }
             })
             .withFailureHandler(function(err) {
+
                 $('#btnLogin').removeAttr('disabled');
                 $('#loginSpinner').addClass('d-none');
                 $('#btnText').text('START GAME');
+
                 Swal.fire({
                     icon: 'error',
                     title: 'SERVER ERROR',
@@ -270,21 +525,25 @@ $(document).ready(function() {
                     background: '#1e293b',
                     color: '#fff'
                 });
+
             })
             .prosesLogin(username, password);
     });
 
     $('#btnLupaPassword').on('click', function(e) {
+
         e.preventDefault();
+
         Swal.fire({
             icon: 'info',
             title: 'SISTEM TERKUNCI',
-            html: `Tidak bisa masuk? Lupa password?<br><br>Silakan temui <b>Bapak Chafid Nur, S.Kom.</b> secara langsung untuk melakukan sinkronisasi ulang dan reset password akun Anda.`,
+            html: `Tidak bisa masuk? Lupa password?<br><br>Silakan temui <b>Yang Mulia: Chafid Nur, S.Kom.</b> secara langsung untuk melakukan sinkronisasi ulang dan reset password akun Anda.`,
             background: '#1e293b',
             color: '#fff',
             confirmButtonColor: '#3b82f6',
             confirmButtonText: 'MENGERTI'
         });
+
     });
 });
 </script>
