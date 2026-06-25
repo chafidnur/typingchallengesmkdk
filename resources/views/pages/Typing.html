@@ -13,45 +13,72 @@
         border-radius: 20px;
         padding: 30px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        position: relative;
     }
     .word-box {
         background: rgba(15, 23, 42, 0.6);
         border: 2px solid rgba(255, 255, 255, 0.05);
         border-radius: 15px;
         padding: 25px;
-        font-size: 1.5rem;
-        line-height: 2.3rem;
-        letter-spacing: 1px;
+        font-size: 1.6rem;
+        line-height: 2.5rem;
+        letter-spacing: 1.5px;
         min-height: 120px;
         margin-bottom: 25px;
         user-select: none;
-        text-align: justify;
+        text-align: left;
+        position: relative;
+        font-family: 'Consolas', 'Courier New', monospace; /* Menggunakan font monospaced untuk feel ketik profesional */
     }
-    /* Indikator Huruf saat diketik */
+
+    /* Modifikasi Indikator Huruf ala 10FastFingers */
+    #wordBoxContainer span {
+        border-radius: 4px;
+        padding: 0 2px;
+        transition: background-color 0.1s;
+    }
     .char-current {
-        background-color: rgba(59, 130, 246, 0.3);
-        border-bottom: 3px solid #3b82f6;
+        background-color: rgba(59, 130, 246, 0.4);
         color: #fff;
+        border-bottom: 3px solid #3b82f6; /* Kursor garis bawah */
     }
     .char-correct { color: #10b981; }
-    .char-incorrect { background-color: rgba(239, 68, 68, 0.3); color: #ef4444; border-radius: 4px; }
+    .char-incorrect { background-color: rgba(239, 68, 68, 0.5); color: #fff; }
 
-    .input-typing {
-        width: 100%;
-        background: rgba(15, 23, 42, 0.8);
-        border: 2px solid #334155;
-        border-radius: 12px;
-        padding: 15px;
-        color: #fff;
-        font-size: 1.2rem;
-        outline: none;
-        font-family: 'Orbitron', sans-serif;
-        letter-spacing: 1px;
-        text-align: center;
+    /* Input Tersembunyi (Invisible) untuk menangkap Backspace */
+    .input-hidden {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0; /* Sengaja dibuat tidak terlihat */
+        z-index: -1;
+        width: 10px;
+        height: 10px;
     }
-    .input-typing:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+
+    /* Notifikasi overlay saat arena di-klik */
+    .focus-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(4px);
+        border-radius: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        cursor: pointer;
+        transition: opacity 0.3s ease;
+    }
+    .focus-overlay h4 { margin: 0; font-family: 'Orbitron', sans-serif; color: #3b82f6; letter-spacing: 2px;}
+    
+    /* Disembunyikan ketika fokus aktif */
+    .arena-focused .focus-overlay {
+        opacity: 0;
+        pointer-events: none;
     }
     
     .live-stat {
@@ -67,7 +94,7 @@
             <h2 class="fw-bold mb-0" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">
                 <i class="fas fa-keyboard text-info me-2"></i> TRAINING ARENA
             </h2>
-            <p class="text-secondary mb-0">Asah kecepatan mengetik 10 jarimu</p>
+            <p class="text-secondary mb-0">Asah kecepatan dan memori otot jarimu</p>
         </div>
         <div class="d-flex">
             <button class="btn btn-outline-info rounded-pill fw-bold px-3 me-2" id="btnToggleSound" onclick="toggleSound()">
@@ -81,19 +108,19 @@
 
     <div class="row g-3 mb-4 text-center">
         <div class="col-4">
-            <div class="bg-dark rgba-30 border border-secondary rounded-3 p-3">
+            <div class="bg-dark border border-secondary rounded-3 p-3">
                 <div class="text-secondary small fw-bold">WAKTU</div>
                 <div class="live-stat text-warning" id="liveTimer">60<span class="fs-6 text-secondary">s</span></div>
             </div>
         </div>
         <div class="col-4">
-            <div class="bg-dark rgba-30 border border-secondary rounded-3 p-3">
+            <div class="bg-dark border border-secondary rounded-3 p-3">
                 <div class="text-secondary small fw-bold">SPEED</div>
                 <div class="live-stat text-info" id="liveWpm">0 <span class="fs-6 text-secondary">WPM</span></div>
             </div>
         </div>
         <div class="col-4">
-            <div class="bg-dark rgba-30 border border-secondary rounded-3 p-3">
+            <div class="bg-dark border border-secondary rounded-3 p-3">
                 <div class="text-secondary small fw-bold">AKURASI</div>
                 <div class="live-stat text-success" id="liveAcc">100<span class="fs-6 text-secondary">%</span></div>
             </div>
@@ -101,36 +128,45 @@
     </div>
 
     <div class="game-card">
-        <div class="word-box" id="wordBoxContainer">
+        <div class="word-box" id="typingAreaWrapper" onclick="focusInputField()">
+            <div class="focus-overlay" id="focusOverlay">
+                <h4><i class="fas fa-mouse-pointer me-2"></i>KLIK DI SINI UNTUK MULAI</h4>
             </div>
+            
+            <div id="wordBoxContainer">
+                </div>
+        </div>
 
-        <input type="text" id="inputTypingField" class="input-typing" placeholder="Klik di sini dan mulai mengetik untuk menjalankan waktu..." autocomplete="off">
+        <input type="text" id="hiddenInputField" class="input-hidden" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        
+        <div class="text-center mt-3">
+            <button class="btn btn-sm btn-outline-warning rounded-pill" onclick="resetGame()">
+                <i class="fas fa-sync-alt me-1"></i> Ulangi (F5)
+            </button>
+        </div>
     </div>
 </div>
 
 <script>
     // ==========================================
-    // DEKLARASI VARIABEL GLOBAL (ANTI SPA-RESET)
+    // DEKLARASI VARIABEL GLOBAL
     // ==========================================
-    var targetText = "Teknologi kecerdasan buatan berkembang sangat pesat di era digital abad dua puluh satu ini. Siswa SMK Duta Karya Kudus harus terus belajar koding dan mengasah kompetensi multimedia secara disiplin demi masa depan yang gemilang.";
+    var targetText = "Teknologi AI berkembang sangat pesat. Seorang programmer harus bisa mengetik kode dengan cepat dan presisi tinggi.";
     var timeRemaining = 60;
     var timerInterval = null;
     var isPlaying = false;
-    var charIndex = 0;
-    var kesalahan = 0;
+    
+    // Variabel Pelacak Posisi ala 10FastFingers
+    var charIndex = 0;           // Posisi kursor saat ini
+    var kesalahanTotal = 0;      // Total error yang dibuat untuk dihitung akhir
+    var arrayStatusKetik = [];   // Menyimpan status tiap karakter: 1 (Benar), 0 (Salah), null (Belum)
 
-    // AUDIO CONFIGURATION (Gaya 10FastFingers Mekanik)
+    // AUDIO CONFIGURATION
     var isSoundEnabled = true;
     var soundClick = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); 
     var soundError = new Audio('https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3'); 
+    soundClick.volume = 0.6; soundError.volume = 0.4;
 
-    // Volume Adjustment agar nyaman didengar siswa
-    soundClick.volume = 0.6;
-    soundError.volume = 0.4;
-
-    // ==========================================
-    // FITUR UTUH: SISTEM AUDIO ENGINE
-    // ==========================================
     function toggleSound() {
         isSoundEnabled = !isSoundEnabled;
         let btn = document.getElementById('btnToggleSound');
@@ -145,29 +181,51 @@
 
     function playTypeSound(isTypo = false) {
         if (!isSoundEnabled) return;
-        
         if (isTypo) {
-            soundError.currentTime = 0; // Reset ke detik awal (Zero Latency)
-            soundError.play().catch(e => {});
+            soundError.currentTime = 0; soundError.play().catch(e => {});
         } else {
-            soundClick.currentTime = 0; // Reset ke detik awal (Zero Latency)
-            soundClick.play().catch(e => {});
+            soundClick.currentTime = 0; soundClick.play().catch(e => {});
         }
     }
 
     // ==========================================
     // LOGIKA PERMAINAN (GAME ENGINE)
     // ==========================================
+    
+    // Fungsi untuk memaksa fokus ke input tersembunyi saat kotak diklik
+    function focusInputField() {
+        $('#hiddenInputField').focus();
+    }
+
     function renderTeksMulai() {
         let container = $('#wordBoxContainer');
         container.empty();
+        arrayStatusKetik = new Array(targetText.length).fill(null);
         
-        // Memecah teks menjadi span per karakter agar bisa diwarnai satu per satu
         targetText.split('').forEach((char, index) => {
             let span = $('<span>').text(char);
             if(index === 0) span.addClass('char-current');
             container.append(span);
         });
+    }
+
+    function resetGame() {
+        clearInterval(timerInterval);
+        timeRemaining = 60;
+        charIndex = 0;
+        kesalahanTotal = 0;
+        isPlaying = false;
+        
+        $('#liveTimer').html('60<span class="fs-6 text-secondary">s</span>');
+        $('#liveWpm').html('0 <span class="fs-6 text-secondary">WPM</span>');
+        $('#liveAcc').html('100<span class="fs-6 text-secondary">%</span>');
+        
+        $('#hiddenInputField').val('');
+        $('#hiddenInputField').prop('disabled', false);
+        
+        // Reset fokus
+        $('#typingAreaWrapper').removeClass('arena-focused');
+        renderTeksMulai();
     }
 
     function startTimer() {
@@ -176,7 +234,6 @@
             timeRemaining--;
             $('#liveTimer').html(timeRemaining + '<span class="fs-6 text-secondary">s</span>');
             
-            // Hitung WPM Live secara berkala
             hitungWpmLive();
 
             if (timeRemaining <= 0) {
@@ -189,82 +246,132 @@
         let waktuBerjalan = 60 - timeRemaining;
         if(waktuBerjalan <= 0) return;
         
-        // Rumus WPM standar dunia: (Total Karakter Benar / 5) / (Waktu Berjalan / 60)
-        let totalKarakterBenar = charIndex - kesalahan;
-        if (totalKarakterBenar < 0) totalKarakterBenar = 0;
-        let wpm = Math.round((totalKarakterBenar / 5) / (waktuBerjalan / 60));
+        // Menghitung karakter yang benar dari array status
+        let totalBenar = arrayStatusKetik.filter(status => status === 1).length;
+        let wpm = Math.round((totalBenar / 5) / (waktuBerjalan / 60));
         $('#liveWpm').html(wpm + ' <span class="fs-6 text-secondary">WPM</span>');
+    }
+
+    function hitungAkurasiLive() {
+        let totalBenar = arrayStatusKetik.filter(status => status === 1).length;
+        let totalSalah = arrayStatusKetik.filter(status => status === 0).length;
+        let totalDiketik = totalBenar + totalSalah;
+        
+        if (totalDiketik === 0) return 100;
+        let acc = Math.round((totalBenar / totalDiketik) * 100);
+        return acc;
     }
 
     function endGameSession() {
         clearInterval(timerInterval);
-        $('#inputTypingField').prop('disabled', true);
+        $('#hiddenInputField').prop('disabled', true);
         
-        // Hitung hasil final
-        let akurasiFinal = Math.round(((targetText.length - kesalahan) / targetText.length) * 100);
-        if(akurasiFinal < 0) akurasiFinal = 0;
-        
-        let totalKarakterBenar = charIndex - kesalahan;
-        let wpmFinal = Math.round((totalKarakterBenar / 5) / (1)); // Berdasarkan 1 menit penuh
+        let akurasiFinal = hitungAkurasiLive();
+        let totalBenar = arrayStatusKetik.filter(status => status === 1).length;
+        let wpmFinal = Math.round((totalBenar / 5) / (1)); 
 
         Swal.fire({
-            title: 'WAKTU HABIS!',
-            html: `Sesi latihan Anda selesai.<br><br><b>Kecepatan:</b> ${wpmFinal} WPM<br><b>Akurasi:</b> ${akurasiFinal}%`,
+            title: 'SESI SELESAI!',
+            html: `<b>Kecepatan:</b> <span class="text-info">${wpmFinal} WPM</span><br><b>Akurasi:</b> <span class="text-success">${akurasiFinal}%</span><br><b>Typo:</b> <span class="text-danger">${kesalahanTotal}x</span>`,
             icon: 'success',
             background: '#1e293b',
             color: '#fff',
             confirmButtonColor: '#3b82f6',
-            confirmButtonText: 'LIHAT DASHBOARD'
+            confirmButtonText: 'KEMBALI KE DASHBOARD'
         }).then(() => {
             loadPage('Dashboard');
         });
     }
 
-    // INTERAKSI INPUT KEYBOARD REALTIME
+    // ==========================================
+    // INTERAKSI REALTIME (TERMASUK BACKSPACE)
+    // ==========================================
     (function initGameArena() {
-        // Render teks target di awal layar
         renderTeksMulai();
 
-        // Listener saat kolom input diketik siswa
-        $('#inputTypingField').on('input', function() {
-            let userInputValue = $(this).val();
+        // 1. Tangani Fokus
+        $('#hiddenInputField').on('focus', function() {
+            $('#typingAreaWrapper').addClass('arena-focused');
+        });
+        $('#hiddenInputField').on('blur', function() {
+            if(!isPlaying) $('#typingAreaWrapper').removeClass('arena-focused');
+        });
+
+        // 2. Cegah paste dari clipboard untuk menghindari kecurangan
+        $('#hiddenInputField').on('paste', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // 3. Menangani Input dan Backspace dengan Event 'keydown' (Lebih Presisi)
+        $('#hiddenInputField').on('keydown', function(e) {
             let allSpans = $('#wordBoxContainer span');
             
-            // Jalankan timer di ketukan pertama siswa
-            if (!isPlaying && userInputValue.length > 0) {
-                startTimer();
-            }
-
-            let lastCharInput = userInputValue.charAt(userInputValue.length - 1);
-            let targetChar = targetText.charAt(charIndex);
-
-            // Kondisi 1: Jika ketikan siswa BENAR
-            if (lastCharInput === targetChar) {
-                $(allSpans[charIndex]).removeClass('char-current char-incorrect').addClass('char-correct');
-                playTypeSound(false); // MAIN KAN SUARA MEKANIK
-                charIndex++;
-            } 
-            // Kondisi 2: Jika ketikan siswa SALAH (TYPO)
-            else {
-                $(allSpans[charIndex]).addClass('char-incorrect');
-                playTypeSound(true); // MAIN KAN SUARA ERROR BEEP
-                kesalahan++;
-            }
-
-            // Geser kursor indikator bawah ke huruf berikutnya
-            $(allSpans[charIndex]).addClass('char-current');
+            // Mengabaikan tombol fungsi seperti Shift, Ctrl, Alt
+            if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return;
             
-            // Bersihkan input field secara berkala agar siswa tidak terganggu ketikan lama
-            $(this).val('');
+            // JIKA TOMBOL BACKSPACE DITEKAN
+            if (e.key === 'Backspace') {
+                if (charIndex > 0) {
+                    charIndex--; // Mundurkan kursor
+                    
+                    // Hapus kelas warna pada karakter saat ini
+                    $(allSpans[charIndex]).removeClass('char-correct char-incorrect char-current');
+                    
+                    // Hapus kursor di karakter yang di depan (jika ada)
+                    if (charIndex + 1 < targetText.length) {
+                        $(allSpans[charIndex + 1]).removeClass('char-current');
+                    }
+                    
+                    // Kembalikan kursor ke posisi mundur
+                    $(allSpans[charIndex]).addClass('char-current');
+                    
+                    // Reset status memori ketikan
+                    arrayStatusKetik[charIndex] = null;
+                    
+                    playTypeSound(false); // Suara klik biasa
+                }
+                return; // Stop eksekusi agar tidak membaca karakter
+            }
 
-            // Hitung Akurasi Live
-            let liveAcc = Math.round(((charIndex - kesalahan) / (charIndex || 1)) * 100);
-            if(liveAcc < 0) liveAcc = 0;
-            $('#liveAcc').html(liveAcc + '<span class="fs-6 text-secondary">%</span>');
+            // JIKA TOMBOL HURUF/KARAKTER DITEKAN
+            // Pastikan belum mencapai akhir kalimat
+            if (charIndex < targetText.length) {
+                
+                // Jalankan timer jika baru ketikan pertama
+                if (!isPlaying) startTimer();
 
-            // Jika teks kalimat sudah habis diketik sebelum 60 detik selesai
-            if (charIndex >= targetText.length) {
-                endGameSession();
+                let targetChar = targetText.charAt(charIndex);
+                let userChar = e.key;
+
+                // Cek Kebenaran (Benar)
+                if (userChar === targetChar) {
+                    $(allSpans[charIndex]).removeClass('char-current').addClass('char-correct');
+                    arrayStatusKetik[charIndex] = 1; 
+                    playTypeSound(false);
+                } 
+                // Cek Typo (Salah)
+                else {
+                    $(allSpans[charIndex]).removeClass('char-current').addClass('char-incorrect');
+                    arrayStatusKetik[charIndex] = 0; 
+                    kesalahanTotal++; // Hitung akumulasi typo
+                    playTypeSound(true);
+                }
+
+                charIndex++; // Majukan Kursor
+
+                // Beri kursor garis bawah ke huruf berikutnya (jika belum habis)
+                if (charIndex < targetText.length) {
+                    $(allSpans[charIndex]).addClass('char-current');
+                }
+
+                // Update Akurasi Live
+                $('#liveAcc').html(hitungAkurasiLive() + '<span class="fs-6 text-secondary">%</span>');
+                
+                // Jika sudah sampai ujung
+                if (charIndex >= targetText.length) {
+                    endGameSession();
+                }
             }
         });
     })();
