@@ -27,13 +27,11 @@
         margin: 10px 0;
     }
     
-    /* Efek Glow */
     .text-glow-blue { color: #3b82f6; text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
     .text-glow-green { color: #10b981; text-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
     .text-glow-gold { color: #f59e0b; text-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
     .text-glow-red { color: #ef4444; text-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
     
-    /* Kartu Menu */
     .menu-card {
         background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.1) 100%);
         border: 1px solid rgba(139, 92, 246, 0.3);
@@ -49,7 +47,6 @@
         box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);
     }
     
-    /* Styling khusus Admin Card */
     .admin-card {
         background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
         border-color: rgba(16, 185, 129, 0.3);
@@ -58,15 +55,60 @@
         background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
         box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
     }
+
+    /* KOMPONEN BARU: INTERACTIVE AVATAR STYLING */
+    .avatar-zone {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 3px solid #3b82f6;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        background: #1e293b;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+    }
+    .avatar-zone img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .avatar-overlay-hover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
+    .avatar-zone:hover .avatar-overlay-hover {
+        opacity: 1;
+    }
 </style>
 
 <div class="dashboard-wrapper">
     <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary pb-3">
-        <div>
-            <h2 class="fw-bold" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;" id="dashboardTitle">
-                <i class="fas fa-satellite-dish text-primary me-2"></i> MEMUAT DATA...
-            </h2>
-            <p class="text-secondary mb-0">Selamat datang, <span id="dashNamaUser" class="text-white fw-bold">User</span> <span id="dashRoleBadge" class="badge bg-secondary ms-2">ROLE</span></p>
+        <div class="d-flex align-items-center">
+            <div class="avatar-zone me-3" onclick="pemicuPilihFileAvatar()" title="Klik untuk ganti foto profil">
+                <img id="userAvatarDisplay" src="https://api.dicebear.com/7.x/bottts/svg?seed=default">
+                <div class="avatar-overlay-hover">GANTI</div>
+            </div>
+            <input type="file" id="hiddenAvatarInput" accept="image/*" style="display: none;" onchange="prosesUploadAvatar(this)">
+
+            <div>
+                <h2 class="fw-bold mb-0" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;" id="dashboardTitle">
+                    <i class="fas fa-satellite-dish text-primary me-2"></i> MEMUAT DATA...
+                </h2>
+                <p class="text-secondary mb-0">Selamat datang, <span id="dashNamaUser" class="text-white fw-bold">User</span> <span id="dashRoleBadge" class="badge bg-secondary ms-2">ROLE</span></p>
+            </div>
         </div>
         <button class="btn btn-outline-danger px-4 rounded-pill fw-bold" onclick="logoutSistem()">
             <i class="fas fa-power-off me-2"></i> LOGOUT
@@ -122,18 +164,6 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="menu-card" style="opacity: 0.5; cursor: not-allowed;">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="bg-warning rounded-circle p-3 me-3 d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
-                            <i class="fas fa-flag-checkered fa-2x text-dark"></i>
-                        </div>
-                        <h3 class="fw-bold text-white mb-0" style="font-family: 'Orbitron', sans-serif;">EVENT MANAGER</h3>
-                    </div>
-                    <p class="text-secondary">Buat lobi balapan live, tentukan durasi, dan pantau nilai ujian mengetik kelas.</p>
-                    <button class="btn btn-warning mt-2 rounded-pill px-4 fw-bold w-100 text-dark" disabled><i class="fas fa-lock me-2"></i> V1.2</button>
-                </div>
-            </div>
-            <div class="col-md-6">
                  <div class="menu-card" onclick="loadPage('Typing')">
                     <div class="d-flex align-items-center mb-3">
                         <div class="bg-primary rounded-circle p-3 me-3 d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
@@ -185,32 +215,79 @@
                     <button class="btn btn-primary mt-2 rounded-pill px-4 fw-bold w-100">PLAY NOW <i class="fas fa-arrow-right ms-2"></i></button>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="menu-card" style="opacity: 0.5; cursor: not-allowed;">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="bg-danger rounded-circle p-3 me-3 d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
-                            <i class="fas fa-trophy fa-2x text-white"></i>
-                        </div>
-                        <h3 class="fw-bold text-white mb-0" style="font-family: 'Orbitron', sans-serif;">LIVE RACE (V1.2)</h3>
-                    </div>
-                    <p class="text-secondary">Event kompetisi resmi yang dinilai oleh guru. Tanding langsung melawan teman sekelasmu secara real-time.</p>
-                    <button class="btn btn-secondary mt-2 rounded-pill px-4 fw-bold w-100" disabled><i class="fas fa-lock me-2"></i> LOCKED</button>
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // PERBAIKAN: Menghapus $(document).ready() dan menggantinya dengan eksekusi fungsi langsung 
-    // agar SPA jQuery tidak mengabaikan pembacaan elemen.
+    // Membuka kotak pencarian file komputer ketika gambar di-klik
+    function pemicuPilihFileAvatar() {
+        $('#hiddenAvatarInput').click();
+    }
+
+    // Proses konversi berkas gambar lokal ke Base64 lalu diunggah ke Google Drive
+    function prosesUploadAvatar(inputElement) {
+        let file = inputElement.files[0];
+        if (!file) return;
+
+        // Validasi ekstensi file harus berupa gambar
+        if (!file.type.startsWith('image/')) {
+            Swal.fire({ icon: 'error', title: 'FORMAT SALAH', text: 'Berkas wajib berupa file gambar (JPG/PNG)!', background: '#1e293b', color: '#fff' });
+            return;
+        }
+
+        Swal.fire({
+            title: 'MEMPROSES FOTO',
+            text: 'Mengirim berkas baru ke Google Drive...',
+            background: '#1e293b', color: '#fff',
+            allowOutsideClick: false, showConfirmButton: false,
+            willOpen: () => { Swal.showLoading(); }
+        });
+
+        let usernameActive = localStorage.getItem('username_user') || localStorage.getItem('nama_user');
+        let reader = new FileReader();
+        
+        reader.onload = function(e) {
+            let base64String = e.target.result;
+            
+            // Eksekusi kirim ke server utama GAS
+            google.script.run
+                .withSuccessHandler(function(response) {
+                    if (response.status === 'success') {
+                        // Tampilkan gambar baru secara real-time di UI
+                        $('#userAvatarDisplay').attr('src', base64String);
+                        Swal.fire({ icon: 'success', title: 'BERHASIL', text: response.message, background: '#1e293b', color: '#fff', showConfirmButton: false, timer: 1500 });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'GAGAL', text: response.message, background: '#1e293b', color: '#fff' });
+                    }
+                })
+                .simpanAvatarSiswa(base64String, file.type, usernameActive);
+        };
+        reader.readAsDataURL(file);
+    }
+
     (function initDashboard() {
         let namaPlayer = localStorage.getItem('nama_user');
         let rolePlayer = localStorage.getItem('role_user');
         let kdPlayer = localStorage.getItem('kd_user'); 
+        let usernamePlayer = localStorage.getItem('username_user') || namaPlayer;
         
         if(namaPlayer) $('#dashNamaUser').text(namaPlayer);
         
+        // Memuat foto avatar secara dinamis dari Drive (jika ada berkasnya)
+        if(usernamePlayer) {
+            google.script.run
+                .withSuccessHandler(function(base64Src) {
+                    if(base64Src && base64Src !== "") {
+                        $('#userAvatarDisplay').attr('src', base64Src);
+                    } else {
+                        // Pasang generator robot jika berkas foto belum diupload ke Drive
+                        $('#userAvatarDisplay').attr('src', 'https://api.dicebear.com/7.x/bottts/svg?seed=' + usernamePlayer);
+                    }
+                })
+                .ambilAvatarBase64(usernamePlayer);
+        }
+
         if(kdPlayer) {
             google.script.run
                 .withSuccessHandler(function(stats) {
@@ -220,7 +297,6 @@
                 .getUserStats(kdPlayer);
         }
         
-        // Logika kemunculan panel berdasarkan Role User
         if(rolePlayer === 'ADMIN' || rolePlayer === 'GURU') {
             $('#dashboardTitle').html('<i class="fas fa-terminal text-success me-2"></i> SYSTEM COMMAND');
             $('#dashRoleBadge').text(rolePlayer).addClass('bg-success').removeClass('bg-secondary');
@@ -230,20 +306,16 @@
             $('#dashRoleBadge').text('SISWA').addClass('bg-primary').removeClass('bg-secondary');
             $('#panelSiswa').removeClass('d-none');
         }
-    })(); // Kurung ini akan langsung mengeksekusi fungsi di atas saat halaman diload
+    })();
 
     function logoutSistem() {
         Swal.fire({
             title: 'KELUAR SISTEM?',
             text: "Sesi Anda akan diakhiri.",
             icon: 'warning',
-            background: '#1e293b',
-            color: '#fff',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#3b82f6',
-            confirmButtonText: 'YA, LOGOUT',
-            cancelButtonText: 'BATAL'
+            background: '#1e293b', color: '#fff',
+            showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#3b82f6',
+            confirmButtonText: 'YA, LOGOUT', cancelButtonText: 'BATAL'
         }).then((result) => {
             if (result.isConfirmed) {
                 localStorage.clear();
