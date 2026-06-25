@@ -23,12 +23,17 @@
         font-size: 1.6rem;
         line-height: 2.5rem;
         letter-spacing: 1.5px;
-        min-height: 120px;
+        
+        /* FITUR BARU: Membatasi area teks & menyembunyikan scrollbar */
+        height: 155px; /* Pas untuk 3 baris */
+        overflow: hidden; 
+        scroll-behavior: smooth; /* Efek gulir otomatis yang lembut */
+        
         margin-bottom: 25px;
         user-select: none;
         text-align: left;
         position: relative;
-        font-family: 'Consolas', 'Courier New', monospace; /* Menggunakan font monospaced untuk feel ketik profesional */
+        font-family: 'Consolas', 'Courier New', monospace; 
     }
 
     /* Modifikasi Indikator Huruf ala 10FastFingers */
@@ -40,17 +45,17 @@
     .char-current {
         background-color: rgba(59, 130, 246, 0.4);
         color: #fff;
-        border-bottom: 3px solid #3b82f6; /* Kursor garis bawah */
+        border-bottom: 3px solid #3b82f6; 
     }
     .char-correct { color: #10b981; }
     .char-incorrect { background-color: rgba(239, 68, 68, 0.5); color: #fff; }
 
-    /* Input Tersembunyi (Invisible) untuk menangkap Backspace */
+    /* Input Tersembunyi (Invisible) */
     .input-hidden {
         position: absolute;
         top: 0;
         left: 0;
-        opacity: 0; /* Sengaja dibuat tidak terlihat */
+        opacity: 0; 
         z-index: -1;
         width: 10px;
         height: 10px;
@@ -75,7 +80,6 @@
     }
     .focus-overlay h4 { margin: 0; font-family: 'Orbitron', sans-serif; color: #3b82f6; letter-spacing: 2px;}
     
-    /* Disembunyikan ketika fokus aktif */
     .arena-focused .focus-overlay {
         opacity: 0;
         pointer-events: none;
@@ -106,6 +110,7 @@
         </div>
     </div>
 
+    <!-- Papan Skor Live -->
     <div class="row g-3 mb-4 text-center">
         <div class="col-4">
             <div class="bg-dark border border-secondary rounded-3 p-3">
@@ -127,6 +132,7 @@
         </div>
     </div>
 
+    <!-- Game Card Utama -->
     <div class="game-card">
         <div class="word-box" id="typingAreaWrapper" onclick="focusInputField()">
             <div class="focus-overlay" id="focusOverlay">
@@ -134,7 +140,8 @@
             </div>
             
             <div id="wordBoxContainer">
-                </div>
+                <!-- Kalimat dirender karakter per karakter di sini -->
+            </div>
         </div>
 
         <input type="text" id="hiddenInputField" class="input-hidden" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
@@ -156,10 +163,9 @@
     var timerInterval = null;
     var isPlaying = false;
     
-    // Variabel Pelacak Posisi ala 10FastFingers
-    var charIndex = 0;           // Posisi kursor saat ini
-    var kesalahanTotal = 0;      // Total error yang dibuat untuk dihitung akhir
-    var arrayStatusKetik = [];   // Menyimpan status tiap karakter: 1 (Benar), 0 (Salah), null (Belum)
+    var charIndex = 0;           
+    var kesalahanTotal = 0;      
+    var arrayStatusKetik = [];   
 
     // AUDIO CONFIGURATION
     var isSoundEnabled = true;
@@ -191,10 +197,23 @@
     // ==========================================
     // LOGIKA PERMAINAN (GAME ENGINE)
     // ==========================================
-    
-    // Fungsi untuk memaksa fokus ke input tersembunyi saat kotak diklik
     function focusInputField() {
         $('#hiddenInputField').focus();
+    }
+
+    // FITUR AUTO SCROLL: Menjaga Kursor Tetap di Tengah Teks
+    function prosesAutoScroll(spanElement) {
+        if (!spanElement) return;
+        let wrapper = document.getElementById('typingAreaWrapper');
+        // Mendapatkan posisi Y huruf saat ini relatif terhadap container (dikurangi padding container 25px)
+        let posisiY = spanElement.offsetTop - 25; 
+        
+        // Jika kursor sudah masuk ke baris kedua/ketiga (melebihi 40px), gulir layarnya ke bawah
+        if (posisiY > 40) {
+            wrapper.scrollTop = posisiY - 40; 
+        } else {
+            wrapper.scrollTop = 0; // Kembalikan ke paling atas
+        }
     }
 
     function renderTeksMulai() {
@@ -223,8 +242,9 @@
         $('#hiddenInputField').val('');
         $('#hiddenInputField').prop('disabled', false);
         
-        // Reset fokus
         $('#typingAreaWrapper').removeClass('arena-focused');
+        $('#typingAreaWrapper')[0].scrollTop = 0; // Kembalikan scroll ke paling atas
+        
         renderTeksMulai();
     }
 
@@ -246,7 +266,6 @@
         let waktuBerjalan = 60 - timeRemaining;
         if(waktuBerjalan <= 0) return;
         
-        // Menghitung karakter yang benar dari array status
         let totalBenar = arrayStatusKetik.filter(status => status === 1).length;
         let wpm = Math.round((totalBenar / 5) / (waktuBerjalan / 60));
         $('#liveWpm').html(wpm + ' <span class="fs-6 text-secondary">WPM</span>');
@@ -284,12 +303,11 @@
     }
 
     // ==========================================
-    // INTERAKSI REALTIME (TERMASUK BACKSPACE)
+    // INTERAKSI REALTIME
     // ==========================================
     (function initGameArena() {
         renderTeksMulai();
 
-        // 1. Tangani Fokus
         $('#hiddenInputField').on('focus', function() {
             $('#typingAreaWrapper').addClass('arena-focused');
         });
@@ -297,78 +315,62 @@
             if(!isPlaying) $('#typingAreaWrapper').removeClass('arena-focused');
         });
 
-        // 2. Cegah paste dari clipboard untuk menghindari kecurangan
         $('#hiddenInputField').on('paste', function(e) {
             e.preventDefault();
             return false;
         });
 
-        // 3. Menangani Input dan Backspace dengan Event 'keydown' (Lebih Presisi)
         $('#hiddenInputField').on('keydown', function(e) {
             let allSpans = $('#wordBoxContainer span');
             
-            // Mengabaikan tombol fungsi seperti Shift, Ctrl, Alt
-            if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return;
+            if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta' || e.key === 'CapsLock') return;
             
-            // JIKA TOMBOL BACKSPACE DITEKAN
+            // LOGIKA BACKSPACE
             if (e.key === 'Backspace') {
                 if (charIndex > 0) {
-                    charIndex--; // Mundurkan kursor
+                    charIndex--; 
                     
-                    // Hapus kelas warna pada karakter saat ini
                     $(allSpans[charIndex]).removeClass('char-correct char-incorrect char-current');
-                    
-                    // Hapus kursor di karakter yang di depan (jika ada)
                     if (charIndex + 1 < targetText.length) {
                         $(allSpans[charIndex + 1]).removeClass('char-current');
                     }
-                    
-                    // Kembalikan kursor ke posisi mundur
                     $(allSpans[charIndex]).addClass('char-current');
-                    
-                    // Reset status memori ketikan
                     arrayStatusKetik[charIndex] = null;
                     
-                    playTypeSound(false); // Suara klik biasa
+                    playTypeSound(false); 
+                    prosesAutoScroll(allSpans[charIndex]); // Auto Scroll Mundur
                 }
-                return; // Stop eksekusi agar tidak membaca karakter
+                return; 
             }
 
-            // JIKA TOMBOL HURUF/KARAKTER DITEKAN
-            // Pastikan belum mencapai akhir kalimat
+            // LOGIKA KETIK MAJU
             if (charIndex < targetText.length) {
-                
-                // Jalankan timer jika baru ketikan pertama
                 if (!isPlaying) startTimer();
 
                 let targetChar = targetText.charAt(charIndex);
                 let userChar = e.key;
 
-                // Cek Kebenaran (Benar)
                 if (userChar === targetChar) {
                     $(allSpans[charIndex]).removeClass('char-current').addClass('char-correct');
                     arrayStatusKetik[charIndex] = 1; 
                     playTypeSound(false);
-                } 
-                // Cek Typo (Salah)
-                else {
+                } else {
                     $(allSpans[charIndex]).removeClass('char-current').addClass('char-incorrect');
                     arrayStatusKetik[charIndex] = 0; 
-                    kesalahanTotal++; // Hitung akumulasi typo
+                    kesalahanTotal++; 
                     playTypeSound(true);
                 }
 
-                charIndex++; // Majukan Kursor
+                charIndex++; 
 
-                // Beri kursor garis bawah ke huruf berikutnya (jika belum habis)
                 if (charIndex < targetText.length) {
-                    $(allSpans[charIndex]).addClass('char-current');
+                    let nextSpan = allSpans[charIndex];
+                    $(nextSpan).addClass('char-current');
+                    prosesAutoScroll(nextSpan); // Auto Scroll Maju
                 }
 
-                // Update Akurasi Live
                 $('#liveAcc').html(hitungAkurasiLive() + '<span class="fs-6 text-secondary">%</span>');
                 
-                // Jika sudah sampai ujung
                 if (charIndex >= targetText.length) {
                     endGameSession();
                 }

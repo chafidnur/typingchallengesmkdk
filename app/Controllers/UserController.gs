@@ -87,7 +87,7 @@ function tambahExpSiswa(kd_user, jumlah_exp, aktivitas) {
  * Memproses unggahan file foto dari frontend ke folder Google Drive Admin
  * Nama file dipaksa menggunakan username pengguna untuk sinkronisasi otomatis
  */
-function simpanAvatarSiswa(base64String, mimeType, username) {
+function simpanAvatarUser(base64String, mimeType, username) {
   try {
     const folder = DriveApp.getFolderById(AVATAR_FOLDER_ID);
     const namaFileTarget = String(username).trim();

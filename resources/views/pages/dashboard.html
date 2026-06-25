@@ -261,7 +261,7 @@
                         Swal.fire({ icon: 'error', title: 'GAGAL', text: response.message, background: '#1e293b', color: '#fff' });
                     }
                 })
-                .simpanAvatarSiswa(base64String, file.type, usernameActive);
+                .simpanAvatarUser(base64String, file.type, usernameActive);
         };
         reader.readAsDataURL(file);
     }
