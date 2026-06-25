@@ -1,241 +1,271 @@
 <style>
-    .arena-wrapper { padding: 30px; max-width: 1000px; margin: 0 auto; }
-    
-    .hud-panel {
-        background: #1e293b;
+    /* Styling Arena Mengetik Premium Glassmorphism */
+    .typing-wrapper {
+        padding: 40px 20px;
+        max-width: 900px;
+        margin: 0 auto;
+        min-height: 100vh;
+        color: #fff;
+    }
+    .game-card {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .word-box {
+        background: rgba(15, 23, 42, 0.6);
+        border: 2px solid rgba(255, 255, 255, 0.05);
         border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        border: 1px solid #334155;
-    }
-    
-    .hud-value {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 2.5rem;
-        font-weight: bold;
-    }
-
-    #textContainer {
-        font-size: 1.8rem;
-        line-height: 1.8;
+        padding: 25px;
+        font-size: 1.5rem;
+        line-height: 2.3rem;
         letter-spacing: 1px;
+        min-height: 120px;
+        margin-bottom: 25px;
         user-select: none;
-        background: #0f172a;
-        padding: 40px;
-        border-radius: 15px;
+        text-align: justify;
+    }
+    /* Indikator Huruf saat diketik */
+    .char-current {
+        background-color: rgba(59, 130, 246, 0.3);
+        border-bottom: 3px solid #3b82f6;
+        color: #fff;
+    }
+    .char-correct { color: #10b981; }
+    .char-incorrect { background-color: rgba(239, 68, 68, 0.3); color: #ef4444; border-radius: 4px; }
+
+    .input-typing {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.8);
         border: 2px solid #334155;
-        margin-bottom: 20px;
-        color: #64748b;
-        position: relative;
+        border-radius: 12px;
+        padding: 15px;
+        color: #fff;
+        font-size: 1.2rem;
+        outline: none;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 1px;
+        text-align: center;
     }
-
-    /* Kursor berkedip gaya terminal */
-    .active-char {
-        border-bottom: 4px solid #3b82f6;
-        color: #fff !important;
-        text-shadow: 0 0 10px #3b82f6;
+    .input-typing:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
     }
-    .correct-char { color: #10b981 !important; text-shadow: 0 0 5px rgba(16,185,129,0.5); }
-    .wrong-char { color: #ef4444 !important; background-color: rgba(239,68,68,0.2); border-radius: 3px; }
-
-    /* Input text tersembunyi */
-    #hiddenInput {
-        position: absolute;
-        opacity: 0;
-        z-index: -100;
+    
+    .live-stat {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
     }
 </style>
 
-<div class="arena-wrapper">
-    <div class="d-flex justify-content-between mb-4">
-        <button class="btn btn-outline-secondary rounded-pill" onclick="loadPage('Dashboard')">
-            <i class="fas fa-arrow-left me-2"></i> ABORT MISSION
-        </button>
-        <span class="badge bg-primary fs-6 d-flex align-items-center rounded-pill px-4">
-            MODE: TRAINING
-        </span>
+<div class="typing-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">
+                <i class="fas fa-keyboard text-info me-2"></i> TRAINING ARENA
+            </h2>
+            <p class="text-secondary mb-0">Asah kecepatan mengetik 10 jarimu</p>
+        </div>
+        <div class="d-flex">
+            <button class="btn btn-outline-info rounded-pill fw-bold px-3 me-2" id="btnToggleSound" onclick="toggleSound()">
+                <i class="fas fa-volume-up me-2"></i> SOUND ON
+            </button>
+            <button class="btn btn-outline-secondary rounded-pill fw-bold px-3" onclick="loadPage('Dashboard')">
+                <i class="fas fa-arrow-left me-2"></i> KEMBALI
+            </button>
+        </div>
     </div>
 
-    <div class="hud-panel row text-center align-items-center">
-        <div class="col-4 border-end border-secondary">
-            <div class="text-secondary fw-bold mb-1">SPEED (WPM)</div>
-            <div class="hud-value text-info" id="liveWpm">0</div>
-        </div>
-        <div class="col-4 border-end border-secondary">
-            <div class="text-secondary fw-bold mb-1">ACCURACY</div>
-            <div class="hud-value text-success" id="liveAcc">100%</div>
+    <div class="row g-3 mb-4 text-center">
+        <div class="col-4">
+            <div class="bg-dark rgba-30 border border-secondary rounded-3 p-3">
+                <div class="text-secondary small fw-bold">WAKTU</div>
+                <div class="live-stat text-warning" id="liveTimer">60<span class="fs-6 text-secondary">s</span></div>
+            </div>
         </div>
         <div class="col-4">
-            <div class="text-secondary fw-bold mb-1">TIME LEFT</div>
-            <div class="hud-value text-warning" id="liveTimer">60s</div>
+            <div class="bg-dark rgba-30 border border-secondary rounded-3 p-3">
+                <div class="text-secondary small fw-bold">SPEED</div>
+                <div class="live-stat text-info" id="liveWpm">0 <span class="fs-6 text-secondary">WPM</span></div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="bg-dark rgba-30 border border-secondary rounded-3 p-3">
+                <div class="text-secondary small fw-bold">AKURASI</div>
+                <div class="live-stat text-success" id="liveAcc">100<span class="fs-6 text-secondary">%</span></div>
+            </div>
         </div>
     </div>
 
-    <div id="textContainer">
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status"></div>
-            <h5 class="mt-3">MENDOWNLOAD DATA DARI SERVER...</h5>
-        </div>
-    </div>
+    <div class="game-card">
+        <div class="word-box" id="wordBoxContainer">
+            </div>
 
-    <input type="text" id="hiddenInput" autocomplete="off">
-    
-    <div class="text-center mt-4 text-secondary small">
-        <i class="fas fa-keyboard me-2"></i> Mulai mengetik untuk mengaktifkan timer.
+        <input type="text" id="inputTypingField" class="input-typing" placeholder="Klik di sini dan mulai mengetik untuk menjalankan waktu..." autocomplete="off">
     </div>
 </div>
 
 <script>
-    var targetText = "";
+    // ==========================================
+    // DEKLARASI VARIABEL GLOBAL (ANTI SPA-RESET)
+    // ==========================================
+    var targetText = "Teknologi kecerdasan buatan berkembang sangat pesat di era digital abad dua puluh satu ini. Siswa SMK Duta Karya Kudus harus terus belajar koding dan mengasah kompetensi multimedia secara disiplin demi masa depan yang gemilang.";
     var timeRemaining = 60;
     var timerInterval = null;
     var isPlaying = false;
     var charIndex = 0;
     var kesalahan = 0;
 
-    $(document).ready(function() {
-        // Meminta kalimat random ke Backend
-        google.script.run
-            .withSuccessHandler(function(kalimat) {
-                targetText = kalimat;
-                renderText();
-                $('#hiddenInput').focus();
-            })
-            .withFailureHandler(function() {
-                targetText = "Terjadi kesalahan koneksi. Silakan kembali ke menu utama.";
-                renderText();
-            })
-            .getKalimatAcak();
+    // AUDIO CONFIGURATION (Gaya 10FastFingers Mekanik)
+    var isSoundEnabled = true;
+    var soundClick = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); 
+    var soundError = new Audio('https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3'); 
 
-        // Agar setiap kali area di-klik, input tetap fokus
-        $(document).on('click', function() {
-            $('#hiddenInput').focus();
-        });
+    // Volume Adjustment agar nyaman didengar siswa
+    soundClick.volume = 0.6;
+    soundError.volume = 0.4;
 
-        // Mesin Utama Pengetikan
-        $('#hiddenInput').on('input', function() {
-            let typedVal = $(this).val();
-            
-            // Start Timer jika huruf pertama diketik
-            if(!isPlaying && typedVal.length > 0) {
-                isPlaying = true;
-                startTimer();
-            }
-
-            charIndex = typedVal.length;
-            kesalahan = 0;
-
-            // Pengecekan per huruf
-            for(let i = 0; i < targetText.length; i++) {
-                let charSpan = $(`#char-${i}`);
-                charSpan.removeClass('correct-char wrong-char active-char');
-
-                if (i < charIndex) {
-                    if (typedVal[i] === targetText[i]) {
-                        charSpan.addClass('correct-char');
-                    } else {
-                        charSpan.addClass('wrong-char');
-                        kesalahan++;
-                    }
-                } else if (i === charIndex) {
-                    // Posisi kursor saat ini
-                    charSpan.addClass('active-char');
-                }
-            }
-
-            updateHUD();
-
-            // Jika selesai sampai ujung
-            if(charIndex >= targetText.length) {
-                endGame();
-            }
-        });
-    });
-
-    function renderText() {
-        let html = "";
-        for(let i = 0; i < targetText.length; i++) {
-            html += `<span id="char-${i}">${targetText[i]}</span>`;
+    // ==========================================
+    // FITUR UTUH: SISTEM AUDIO ENGINE
+    // ==========================================
+    function toggleSound() {
+        isSoundEnabled = !isSoundEnabled;
+        let btn = document.getElementById('btnToggleSound');
+        if(isSoundEnabled) {
+            btn.innerHTML = '<i class="fas fa-volume-up me-2"></i> SOUND ON';
+            btn.classList.replace('btn-outline-secondary', 'btn-outline-info');
+        } else {
+            btn.innerHTML = '<i class="fas fa-volume-mute me-2"></i> SOUND OFF';
+            btn.classList.replace('btn-outline-info', 'btn-outline-secondary');
         }
-        $('#textContainer').html(html);
-        $('#char-0').addClass('active-char'); // Set kursor pertama
+    }
+
+    function playTypeSound(isTypo = false) {
+        if (!isSoundEnabled) return;
+        
+        if (isTypo) {
+            soundError.currentTime = 0; // Reset ke detik awal (Zero Latency)
+            soundError.play().catch(e => {});
+        } else {
+            soundClick.currentTime = 0; // Reset ke detik awal (Zero Latency)
+            soundClick.play().catch(e => {});
+        }
+    }
+
+    // ==========================================
+    // LOGIKA PERMAINAN (GAME ENGINE)
+    // ==========================================
+    function renderTeksMulai() {
+        let container = $('#wordBoxContainer');
+        container.empty();
+        
+        // Memecah teks menjadi span per karakter agar bisa diwarnai satu per satu
+        targetText.split('').forEach((char, index) => {
+            let span = $('<span>').text(char);
+            if(index === 0) span.addClass('char-current');
+            container.append(span);
+        });
     }
 
     function startTimer() {
-        let waktuBerjalan = 0;
-        timerInterval = setInterval(() => {
+        isPlaying = true;
+        timerInterval = setInterval(function() {
             timeRemaining--;
-            waktuBerjalan++;
-            $('#liveTimer').text(timeRemaining + 's');
+            $('#liveTimer').html(timeRemaining + '<span class="fs-6 text-secondary">s</span>');
             
-            updateHUD(waktuBerjalan);
+            // Hitung WPM Live secara berkala
+            hitungWpmLive();
 
-            if(timeRemaining <= 0) {
-                endGame();
+            if (timeRemaining <= 0) {
+                endGameSession();
             }
         }, 1000);
     }
 
-    function updateHUD(waktuBerjalan = 0) {
-        // Kalkulasi Akurasi
-        if (charIndex > 0) {
-            let akurasi = Math.max(0, Math.round(((charIndex - kesalahan) / charIndex) * 100));
-            $('#liveAcc').text(akurasi + '%');
-        }
-
-        // Kalkulasi WPM
-        if (waktuBerjalan > 0) {
-            let menit = waktuBerjalan / 60;
-            let kataBenar = (charIndex - kesalahan) / 5;
-            let wpm = Math.max(0, Math.round(kataBenar / menit));
-            $('#liveWpm').text(wpm);
-        }
+    function hitungWpmLive() {
+        let waktuBerjalan = 60 - timeRemaining;
+        if(waktuBerjalan <= 0) return;
+        
+        // Rumus WPM standar dunia: (Total Karakter Benar / 5) / (Waktu Berjalan / 60)
+        let totalKarakterBenar = charIndex - kesalahan;
+        if (totalKarakterBenar < 0) totalKarakterBenar = 0;
+        let wpm = Math.round((totalKarakterBenar / 5) / (waktuBerjalan / 60));
+        $('#liveWpm').html(wpm + ' <span class="fs-6 text-secondary">WPM</span>');
     }
 
-    function endGame() {
+    function endGameSession() {
         clearInterval(timerInterval);
-        $('#hiddenInput').attr('disabled', true);
+        $('#inputTypingField').prop('disabled', true);
         
-        let finalWpm = parseInt($('#liveWpm').text()) || 0;
-        let finalAccText = $('#liveAcc').text();
-        let finalAcc = parseInt(finalAccText.replace('%', '')) || 0;
+        // Hitung hasil final
+        let akurasiFinal = Math.round(((targetText.length - kesalahan) / targetText.length) * 100);
+        if(akurasiFinal < 0) akurasiFinal = 0;
         
-        let kdUser = localStorage.getItem('kd_user');
-        let durasiRiil = 60 - timeRemaining; 
+        let totalKarakterBenar = charIndex - kesalahan;
+        let wpmFinal = Math.round((totalKarakterBenar / 5) / (1)); // Berdasarkan 1 menit penuh
 
-        // Tampilkan loading screen saat menyimpan data
         Swal.fire({
-            title: 'TRANSMITTING DATA...',
-            html: 'Menyinkronkan skor ke server utama.',
+            title: 'WAKTU HABIS!',
+            html: `Sesi latihan Anda selesai.<br><br><b>Kecepatan:</b> ${wpmFinal} WPM<br><b>Akurasi:</b> ${akurasiFinal}%`,
+            icon: 'success',
             background: '#1e293b',
-            color: '#3b82f6',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
+            color: '#fff',
+            confirmButtonColor: '#3b82f6',
+            confirmButtonText: 'LIHAT DASHBOARD'
+        }).then(() => {
+            loadPage('Dashboard');
         });
-
-        // Tembak data ke Code.gs (simpanSkorPemain)
-        google.script.run
-            .withSuccessHandler(function(response) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'MISSION COMPLETE!',
-                    html: `<div class="fs-4 text-info mt-2 mb-2">SPEED: <b>${finalWpm} WPM</b></div>
-                           <div class="fs-4 text-success mb-3">ACCURACY: <b>${finalAcc}%</b></div>`,
-                    background: '#1e293b',
-                    color: '#fff',
-                    confirmButtonText: 'KEMBALI KE BASE',
-                    confirmButtonColor: '#3b82f6',
-                    allowOutsideClick: false
-                }).then(() => {
-                    loadPage('Dashboard');
-                });
-            })
-            .withFailureHandler(function(err) {
-                Swal.fire('TRANSMISI GAGAL', 'Sistem gagal menyimpan skor: ' + err.message, 'error').then(() => {
-                    loadPage('Dashboard');
-                });
-            })
-            .simpanSkorPemain(kdUser, finalWpm, finalAcc, kesalahan, targetText.length, durasiRiil);
     }
+
+    // INTERAKSI INPUT KEYBOARD REALTIME
+    (function initGameArena() {
+        // Render teks target di awal layar
+        renderTeksMulai();
+
+        // Listener saat kolom input diketik siswa
+        $('#inputTypingField').on('input', function() {
+            let userInputValue = $(this).val();
+            let allSpans = $('#wordBoxContainer span');
+            
+            // Jalankan timer di ketukan pertama siswa
+            if (!isPlaying && userInputValue.length > 0) {
+                startTimer();
+            }
+
+            let lastCharInput = userInputValue.charAt(userInputValue.length - 1);
+            let targetChar = targetText.charAt(charIndex);
+
+            // Kondisi 1: Jika ketikan siswa BENAR
+            if (lastCharInput === targetChar) {
+                $(allSpans[charIndex]).removeClass('char-current char-incorrect').addClass('char-correct');
+                playTypeSound(false); // MAIN KAN SUARA MEKANIK
+                charIndex++;
+            } 
+            // Kondisi 2: Jika ketikan siswa SALAH (TYPO)
+            else {
+                $(allSpans[charIndex]).addClass('char-incorrect');
+                playTypeSound(true); // MAIN KAN SUARA ERROR BEEP
+                kesalahan++;
+            }
+
+            // Geser kursor indikator bawah ke huruf berikutnya
+            $(allSpans[charIndex]).addClass('char-current');
+            
+            // Bersihkan input field secara berkala agar siswa tidak terganggu ketikan lama
+            $(this).val('');
+
+            // Hitung Akurasi Live
+            let liveAcc = Math.round(((charIndex - kesalahan) / (charIndex || 1)) * 100);
+            if(liveAcc < 0) liveAcc = 0;
+            $('#liveAcc').html(liveAcc + '<span class="fs-6 text-secondary">%</span>');
+
+            // Jika teks kalimat sudah habis diketik sebelum 60 detik selesai
+            if (charIndex >= targetText.length) {
+                endGameSession();
+            }
+        });
+    })();
 </script>
