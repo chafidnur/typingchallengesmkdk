@@ -130,3 +130,101 @@ function ambilAvatarBase64(username) {
     return "";
   }
 }
+
+/**
+ * Mengambil nama kelas siswa berdasarkan fkd_kelas yang terikat di akunnya
+ */
+function getKelasInfoUser(kd_user) {
+  try {
+    const ss = SpreadsheetApp.openById(DB_ID);
+    const sheetUser = ss.getSheetByName("users");
+    const dataUser = sheetUser.getDataRange().getValues();
+    
+    let fkdKelas = "";
+    for(let i = 1; i < dataUser.length; i++) {
+      if(String(dataUser[i][0]).trim() === kd_user) {
+        fkdKelas = String(dataUser[i][1]).trim(); // Kolom B (fkd_kelas)
+        break;
+      }
+    }
+    
+    if(!fkdKelas || fkdKelas === "-" || fkdKelas === "") return "-";
+    
+    const sheetKelas = ss.getSheetByName("kelas");
+    const dataKelas = sheetKelas.getDataRange().getValues();
+    for(let j = 1; j < dataKelas.length; j++) {
+      if(String(dataKelas[j][0]).trim() === fkdKelas) {
+        return dataKelas[j][3]; // Kolom D: nama_kelas (Contoh: XA-FARMASI)
+      }
+    }
+    return "-";
+  } catch(e) {
+    return "-";
+  }
+}
+
+/**
+ * Mengambil data papan peringkat teratas dari sheet 'score' untuk Hall of Fame
+ */
+function getHallOfFameData() {
+  try {
+    const ss = SpreadsheetApp.openById(DB_ID);
+    const sheetScore = ss.getSheetByName("score");
+    const sheetUser = ss.getSheetByName("users");
+    const sheetKelas = ss.getSheetByName("kelas");
+    
+    if(!sheetScore) return [];
+    
+    const dataScore = sheetScore.getDataRange().getValues();
+    const dataUser = sheetUser.getDataRange().getValues();
+    const dataKelas = sheetKelas.getDataRange().getValues();
+    
+    let userMap = {};
+    let kelasMap = {};
+    
+    // Petakan kelas untuk kecepatan pencarian
+    for(let k = 1; k < dataKelas.length; k++) {
+      kelasMap[dataKelas[k][0]] = dataKelas[k][3]; // kd_kelas -> nama_kelas
+    }
+    
+    // Petakan user untuk mendapatkan nama asli, gelar, dan kelas display
+    for(let u = 1; u < dataUser.length; u++) {
+      let kdU = dataUser[u][0];
+      let klsID = dataUser[u][1];
+      userMap[kdU] = {
+        nama: dataUser[u][2],
+        gelar: dataUser[u][14] || "Trainee", // Kolom O (Gelar)
+        kelas: kelasMap[klsID] || "Guru/Admin"
+      };
+    }
+    
+    let rekorSiswa = {};
+    
+    // Cari rekor tertinggi (WPM Terbesar) dari tiap user unik
+    for(let i = 1; i < dataScore.length; i++) {
+      let fkdUser = dataScore[i][1];
+      let wpm = parseInt(dataScore[i][3]) || 0;
+      let acc = parseInt(dataScore[i][4]) || 0;
+      
+      if(userMap[fkdUser]) {
+        if(!rekorSiswa[fkdUser] || wpm > rekorSiswa[fkdUser].wpm) {
+          rekorSiswa[fkdUser] = {
+            nama: userMap[fkdUser].nama,
+            kelas: userMap[fkdUser].kelas,
+            gelar: userMap[fkdUser].gelar,
+            wpm: wpm,
+            accuracy: acc
+          };
+        }
+      }
+    }
+    
+    // Ubah objek menjadi array dan urutkan dari WPM tertinggi
+    let leaderboard = Object.values(rekorSiswa);
+    leaderboard.sort((a, b) => b.wpm - a.wpm);
+    
+    return leaderboard.slice(0, 10); // Ambil Top 10 Besar saja
+  } catch(e) {
+    return [];
+  }
+}
