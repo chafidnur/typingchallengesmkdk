@@ -288,18 +288,63 @@
         let akurasiFinal = hitungAkurasiLive();
         let totalBenar = arrayStatusKetik.filter(status => status === 1).length;
         let wpmFinal = Math.round((totalBenar / 5) / (1)); 
-
+        
+        // Tampilkan loading saat mengirim data ke server
         Swal.fire({
-            title: 'SESI SELESAI!',
-            html: `<b>Kecepatan:</b> <span class="text-info">${wpmFinal} WPM</span><br><b>Akurasi:</b> <span class="text-success">${akurasiFinal}%</span><br><b>Typo:</b> <span class="text-danger">${kesalahanTotal}x</span>`,
-            icon: 'success',
-            background: '#1e293b',
-            color: '#fff',
-            confirmButtonColor: '#3b82f6',
-            confirmButtonText: 'KEMBALI KE DASHBOARD'
-        }).then(() => {
-            loadPage('Dashboard');
+            title: 'MENGHITUNG SKOR...',
+            text: 'Sistem sedang memvalidasi EXP dan Gelar Anda.',
+            background: '#1e293b', color: '#fff',
+            allowOutsideClick: false, showConfirmButton: false,
+            willOpen: () => { Swal.showLoading(); }
         });
+
+        // Siapkan paket data untuk dikirim ke Backend
+        let paketData = {
+            kd_user: localStorage.getItem('kd_user'), // Ambil ID siswa yang sedang login
+            wpm: wpmFinal,
+            akurasi: akurasiFinal,
+            total_benar: totalBenar,       // Tambahan parameter baru
+            total_salah: kesalahanTotal,   // Tambahan parameter baru
+            typo: kesalahanTotal
+        };
+
+        // Panggil jembatan Backend
+        google.script.run
+            .withSuccessHandler(function(res) {
+                if(res.status === 'success') {
+                    let teksHtml = `
+                        <b>Kecepatan:</b> <span class="text-info">${wpmFinal} WPM</span><br>
+                        <b>Akurasi:</b> <span class="text-success">${akurasiFinal}%</span><br>
+                        <b>Typo:</b> <span class="text-danger">${kesalahanTotal}x</span><br><br>
+                        <hr class="border-secondary">
+                        <h4 class="text-warning">+${res.exp} EXP</h4>
+                        <small class="text-secondary">Level Anda Saat Ini: <b>Lv.${res.level}</b></small><br>
+                        <small class="text-secondary">Sisa Stamina EXP Hari ini: <b>${res.sisaStamina > 0 ? res.sisaStamina : 0}x</b></small>
+                    `;
+
+                    // Jika dapat gelar baru (Mangekyou / The Flash, dll)
+                    if(res.achievement) {
+                        teksHtml += `<br><br><div class="p-2 bg-dark rounded border border-warning">
+                                     <h5 class="text-warning mb-0 text-glow-gold">GELAR BARU TERBUKA!</h5>
+                                     <span class="text-white">${res.achievement}</span>
+                                     </div>`;
+                    }
+
+                    Swal.fire({
+                        title: 'SESI SELESAI!',
+                        html: teksHtml,
+                        icon: 'success',
+                        background: '#1e293b', color: '#fff',
+                        confirmButtonColor: '#3b82f6',
+                        confirmButtonText: 'KEMBALI KE DASHBOARD'
+                    }).then(() => {
+                        loadPage('Dashboard');
+                    });
+                } else {
+                    Swal.fire('Gagal Menyimpan!', res.message, 'error');
+                }
+            })
+            .submitGameResult(paketData);
     }
 
     // ==========================================
