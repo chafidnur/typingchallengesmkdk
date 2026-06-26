@@ -173,59 +173,46 @@ function getHallOfFameData() {
     const sheetUser = ss.getSheetByName("users");
     const sheetKelas = ss.getSheetByName("kelas");
     
-    if(!sheetScore) return [];
-    
     const dataScore = sheetScore.getDataRange().getValues();
     const dataUser = sheetUser.getDataRange().getValues();
     const dataKelas = sheetKelas.getDataRange().getValues();
     
-    let userMap = {};
     let kelasMap = {};
-    
-    // Petakan kelas untuk kecepatan pencarian
     for(let k = 1; k < dataKelas.length; k++) {
-      kelasMap[dataKelas[k][0]] = dataKelas[k][3]; // kd_kelas -> nama_kelas
-    }
-    
-    // Petakan user untuk mendapatkan nama asli, gelar, dan kelas display
-    for(let u = 1; u < dataUser.length; u++) {
-      let kdU = dataUser[u][0];
-      let klsID = dataUser[u][1];
-      userMap[kdU] = {
-        nama: dataUser[u][2],
-        gelar: dataUser[u][14] || "Trainee", // Kolom O (Gelar)
-        kelas: kelasMap[klsID] || "Guru/Admin"
-      };
+      kelasMap[String(dataKelas[k][0]).trim()] = dataKelas[k][3]; // Nama Kelas
     }
     
     let rekorSiswa = {};
     
-    // Cari rekor tertinggi (WPM Terbesar) dari tiap user unik
     for(let i = 1; i < dataScore.length; i++) {
-      let fkdUser = dataScore[i][1];
+      let kdUser = String(dataScore[i][1]).trim();
       let wpm = parseInt(dataScore[i][3]) || 0;
       let acc = parseInt(dataScore[i][4]) || 0;
       
-      if(userMap[fkdUser]) {
-        if(!rekorSiswa[fkdUser] || wpm > rekorSiswa[fkdUser].wpm) {
-          rekorSiswa[fkdUser] = {
-            avatar: ambilAvatarBase64(fkdUser),
-            nama: userMap[fkdUser].nama,
-            kelas: userMap[fkdUser].kelas,
-            tahun_ajaran: userMap[fkdUser].tahun_ajaran,
-            gelar: userMap[fkdUser].gelar,
+      // Cari data user untuk melengkapi info
+      let userData = dataUser.find(u => String(u[0]).trim() === kdUser);
+      
+      if(userData) {
+        let nama = userData[2] || "Unknown";
+        let kelasID = String(userData[1]).trim();
+        let gelar = userData[14] || "Trainee"; // Pastikan kolom 14/O adalah Gelar
+        let namaKelas = kelasMap[kelasID] || "Kelas Tidak Ditemukan";
+        
+        if(!rekorSiswa[kdUser] || wpm > rekorSiswa[kdUser].wpm) {
+          rekorSiswa[kdUser] = {
+            nama: nama,
+            username: kdUser,
+            kelas: namaKelas,
+            gelar: gelar,
+            avatar: ambilAvatarBase64(kdUser),
             wpm: wpm,
-            accuracy: acc
+            acc: acc
           };
         }
       }
     }
     
-    // Ubah objek menjadi array dan urutkan dari WPM tertinggi
-    let leaderboard = Object.values(rekorSiswa);
-    leaderboard.sort((a, b) => b.wpm - a.wpm);
-    
-    return leaderboard.slice(0, 10); // Ambil Top 10 Besar saja
+    return Object.values(rekorSiswa).sort((a, b) => b.wpm - a.wpm).slice(0, 10);
   } catch(e) {
     return [];
   }
