@@ -37,12 +37,18 @@
                 </h2>
                 <p class="text-secondary mb-0 mt-1" style="font-size: 1.1rem;">
                     Selamat datang, <span id="dashNamaUser" class="text-white fw-bold">User</span>
-                    <span id="wrapKelas" class="d-none">, kelas <span id="dashNamaKelas" class="text-info fw-bold"></span></span>
+                    <span id="dashRoleBadge" class="badge bg-secondary ms-2 align-middle">ROLE</span>
+                    <br>
+                    <!-- Wadah Sapaan Lengkap Relasional -->
+                    <span id="wrapInfoLengkap" class="d-none text-info" style="font-size: 0.9rem; letter-spacing: 0.5px;">
+                        <i class="fas fa-graduation-cap me-1"></i> Kelas <span id="dashNamaKelas" class="fw-bold"></span> 
+                        • <span id="dashProdi"></span> 
+                        • TA <span id="dashTA"></span>
+                    </span>
                     <br>
                     <span id="wrapGelar" class="d-none" style="font-size: 0.9rem;">
                         <i class="fas fa-star text-warning me-1"></i> Gelar saat ini: <span id="dashGelar" class="text-warning fw-bold"></span>
                     </span>
-                    <span id="dashRoleBadge" class="badge bg-secondary ms-2 align-middle">ROLE</span>
                 </p>
             </div>
         </div>
@@ -220,24 +226,30 @@
             }).ambilAvatarBase64(usernamePlayer);
         }
 
-        // Ambil Data Stats, Kelas, dan Gelar
+        // Ambil Data Sapaan Akademik Lengkap (Kelas, Prodi, Tahun Ajaran)
         if(kdPlayer) {
-            // Asumsi Backend Yang Mulia mengirimkan Kelas dan Gelar bersama Stats, atau kita pakai fungsi yang kita buat sebelumnya
-            google.script.run.withSuccessHandler(function(namaKelas) {
-                if(namaKelas && namaKelas !== "-") {
-                    $('#dashNamaKelas').text(namaKelas);
-                    $('#wrapKelas').removeClass('d-none');
-                }
-            }).getKelasInfoUser(kdPlayer);
+            google.script.run
+                .withSuccessHandler(function(info) {
+                    if(info.status === 'success' && info.kelas !== "-") {
+                        $('#dashNamaKelas').text(info.kelas);
+                        $('#dashProdi').text(info.prodi);
+                        $('#dashTA').text(info.tahunAjaran);
+                        $('#wrapInfoLengkap').removeClass('d-none');
+                    }
+                })
+                .getInfoSapaan(kdPlayer);
 
-            google.script.run.withSuccessHandler(function(stats) {
-                $('#statWpm').text(stats.wpm);
-                $('#statAcc').text(stats.acc + '%');
-                if(stats.gelar && stats.gelar !== "") {
-                    $('#dashGelar').text(stats.gelar);
-                    $('#wrapGelar').removeClass('d-none');
-                }
-            }).getUserStats(kdPlayer); // Pastikan getUserStats di backend me-return properti 'gelar'
+            // Tetap jalankan pengambilan statistik WPM, ACC, dan Gelar
+            google.script.run
+                .withSuccessHandler(function(stats) {
+                    $('#statWpm').text(stats.wpm);
+                    $('#statAcc').text(stats.acc + '%');
+                    if(stats.gelar && stats.gelar !== "") {
+                        $('#dashGelar').text(stats.gelar);
+                        $('#wrapGelar').removeClass('d-none');
+                    }
+                })
+                .getUserStats(kdPlayer); 
         }
         
         if(rolePlayer === 'ADMIN' || rolePlayer === 'GURU') {

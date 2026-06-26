@@ -228,3 +228,79 @@ function getHallOfFameData() {
     return [];
   }
 }
+
+/**
+ * Mengambil info relasional untuk sapaan Dashboard: Kelas, Prodi, dan Tahun Ajaran Aktif
+ */
+function getInfoSapaan(kd_user) {
+  try {
+    const ss = SpreadsheetApp.openById(DB_ID);
+    
+    // 1. Cari Tahun Ajaran Aktif
+    const sheetTA = ss.getSheetByName("tahun_ajaran");
+    let infoTA = "-";
+    if (sheetTA) {
+      const dataTA = sheetTA.getDataRange().getValues();
+      for (let i = 1; i < dataTA.length; i++) {
+        // Cek kolom status_aktif (Indeks 3 / Kolom D)
+        if (String(dataTA[i][3]).trim() === "1") { 
+          infoTA = dataTA[i][1] + " Semester " + dataTA[i][2]; 
+          break;
+        }
+      }
+    }
+
+    // 2. Cari fkd_kelas pada data User
+    const sheetUser = ss.getSheetByName("users");
+    const dataUser = sheetUser.getDataRange().getValues();
+    let fkdKelas = "";
+    for(let i = 1; i < dataUser.length; i++) {
+      if(String(dataUser[i][0]).trim() === kd_user) {
+        fkdKelas = String(dataUser[i][1]).trim(); // Kolom B
+        break;
+      }
+    }
+
+    let namaKelas = "-";
+    let fkdProdi = "";
+    let namaProdi = "-";
+
+    // 3. Tarik Nama Kelas dan fkd_prodi
+    if (fkdKelas && fkdKelas !== "-") {
+      const sheetKelas = ss.getSheetByName("kelas");
+      if (sheetKelas) {
+        const dataKelas = sheetKelas.getDataRange().getValues();
+        for(let j = 1; j < dataKelas.length; j++) {
+          if(String(dataKelas[j][0]).trim() === fkdKelas) {
+            namaKelas = dataKelas[j][3]; // Kolom D
+            fkdProdi = dataKelas[j][1];  // Kolom B
+            break;
+          }
+        }
+      }
+
+      // 4. Tarik Nama Lengkap Program Studi
+      if (fkdProdi) {
+        const sheetProdi = ss.getSheetByName("programstudi");
+        if (sheetProdi) {
+          const dataProdi = sheetProdi.getDataRange().getValues();
+          for (let k = 1; k < dataProdi.length; k++) {
+            if (String(dataProdi[k][0]).trim() === fkdProdi) {
+              namaProdi = dataProdi[k][1]; // Kolom B
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      status: "success",
+      kelas: namaKelas,
+      prodi: namaProdi,
+      tahunAjaran: infoTA
+    };
+  } catch(e) {
+    return { status: "error", message: e.message };
+  }
+}

@@ -462,6 +462,9 @@
 
 <script>
 $(document).ready(function() {
+    // FITUR KEAMANAN BARU: Hapus semua token/memori saat halaman login dimuat
+    localStorage.clear();
+    
     $('#formLogin').on('submit', function(e) {
         e.preventDefault();
 
