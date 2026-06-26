@@ -89,3 +89,86 @@ function hapusKalimat(kd_kalimat) {
     return { status: "error", message: "Gagal menghapus: " + e.message };
   }
 }
+
+/**
+ * Mengambil satu kalimat secara acak dari database yang cocok dengan jurusan siswa
+ */
+function ambilKalimatAcakSesuaiJurusan(kd_user) {
+  try {
+    const ss = SpreadsheetApp.openById(DB_ID);
+    
+    // 1. Identifikasi kelas dan jurusan siswa
+    const sheetUser = ss.getSheetByName("users");
+    const dataUser = sheetUser.getDataRange().getValues();
+    let fkdKelas = "";
+    
+    for(let i = 1; i < dataUser.length; i++) {
+      if(String(dataUser[i][0]).trim() === kd_user) {
+        fkdKelas = String(dataUser[i][1]).trim(); 
+        break;
+      }
+    }
+    
+    let singkatanProdi = "UMUM";
+    if(fkdKelas !== "") {
+      const sheetKelas = ss.getSheetByName("kelas");
+      const dataKelas = sheetKelas.getDataRange().getValues();
+      let fkdProdi = "";
+      for(let i = 1; i < dataKelas.length; i++) {
+        if(String(dataKelas[i][0]).trim() === fkdKelas) {
+          fkdProdi = String(dataKelas[i][1]).trim(); 
+          break;
+        }
+      }
+      
+      if(fkdProdi !== "") {
+        const sheetProdi = ss.getSheetByName("programstudi");
+        const dataProdi = sheetProdi.getDataRange().getValues();
+        for(let i = 1; i < dataProdi.length; i++) {
+          if(String(dataProdi[i][0]).trim() === fkdProdi) {
+            singkatanProdi = String(dataProdi[i][2]).trim().toUpperCase(); 
+            break;
+          }
+        }
+      }
+    }
+    
+    // 2. Filter kalimat yang sesuai dengan Jurusan Aktif ATAU kategori UMUM
+    const sheetKalimat = ss.getSheetByName("kalimat");
+    const dataKalimat = sheetKalimat.getDataRange().getValues();
+    let poolKalimat = [];
+    
+    for(let i = 1; i < dataKalimat.length; i++) {
+      let katKalimat = String(dataKalimat[i][1]).trim().toUpperCase(); // Kolom B: kategori_jurusan
+      if(katKalimat === singkatanProdi || katKalimat === "UMUM") {
+        poolKalimat.push({
+          kd_kalimat: dataKalimat[i][0],
+          teks: dataKalimat[i][3],
+          level: dataKalimat[i][2]
+        });
+      }
+    }
+    
+    // Bukaan Pengaman: Jika belum ada kalimat khusus prodi, ambil dari semua stok yang ada
+    if(poolKalimat.length === 0 && dataKalimat.length > 1) {
+      for(let i = 1; i < dataKalimat.length; i++) {
+        poolKalimat.push({
+          kd_kalimat: dataKalimat[i][0],
+          teks: dataKalimat[i][3],
+          level: dataKalimat[i][2]
+        });
+      }
+    }
+    
+    if(poolKalimat.length === 0) {
+      return { status: "error", message: "Bank Kalimat masih kosong. Silakan Admin isi terlebih dahulu." };
+    }
+    
+    // Kocok data dan ambil satu kalimat secara acak
+    let acakIndex = Math.floor(Math.random() * poolKalimat.length);
+    return { status: "success", data: poolKalimat[acakIndex] };
+    
+  } catch(e) {
+    return { status: "error", message: e.message };
+  }
+}

@@ -347,12 +347,32 @@
             .submitGameResult(paketData);
     }
 
-    // ==========================================
-    // INTERAKSI REALTIME
+// ==========================================
+    // INTERAKSI REALTIME & INSTANTIATION ENGINE
     // ==========================================
     (function initGameArena() {
-        renderTeksMulai();
+        // Tampilkan animasi memuat teks dari database
+        $('#wordBoxContainer').html('<div class="text-center py-2 text-secondary small"><span class="spinner-border spinner-border-sm me-2" role="status"></span>Menyinkronkan teks kompetensi jurusan...</div>');
+        
+        let kdUserActive = localStorage.getItem('kd_user');
 
+        // Tarik kalimat dinamis dari database Apps Script
+        google.script.run
+            .withSuccessHandler(function(response) {
+                if(response.status === 'success') {
+                    // Isi variabel targetText dengan teks acak hasil filter database
+                    targetText = response.data.teks;
+                    
+                    // Render huruf ke dalam arena
+                    renderTeksMulai();
+                } else {
+                    Swal.fire('Gagal Memuat Soal', response.message, 'error');
+                    $('#wordBoxContainer').html(`<span class="text-danger small"><i class="fas fa-exclamation-triangle me-1"></i> ${response.message}</span>`);
+                }
+            })
+            .ambilKalimatAcakSesuaiJurusan(kdUserActive);
+
+        // 1. Tangani Fokus Input
         $('#hiddenInputField').on('focus', function() {
             $('#typingAreaWrapper').addClass('arena-focused');
         });
@@ -360,35 +380,32 @@
             if(!isPlaying) $('#typingAreaWrapper').removeClass('arena-focused');
         });
 
+        // 2. Cegah kecurangan paste
         $('#hiddenInputField').on('paste', function(e) {
             e.preventDefault();
             return false;
         });
 
+        // 3. Menangani Input Keyboard Maju Mundur (Tetap menggunakan kode Yang Mulia yang sudah ada)
         $('#hiddenInputField').on('keydown', function(e) {
             let allSpans = $('#wordBoxContainer span');
-            
             if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta' || e.key === 'CapsLock') return;
             
-            // LOGIKA BACKSPACE
             if (e.key === 'Backspace') {
                 if (charIndex > 0) {
                     charIndex--; 
-                    
                     $(allSpans[charIndex]).removeClass('char-correct char-incorrect char-current');
                     if (charIndex + 1 < targetText.length) {
                         $(allSpans[charIndex + 1]).removeClass('char-current');
                     }
                     $(allSpans[charIndex]).addClass('char-current');
                     arrayStatusKetik[charIndex] = null;
-                    
                     playTypeSound(false); 
-                    prosesAutoScroll(allSpans[charIndex]); // Auto Scroll Mundur
+                    prosesAutoScroll(allSpans[charIndex]); 
                 }
                 return; 
             }
 
-            // LOGIKA KETIK MAJU
             if (charIndex < targetText.length) {
                 if (!isPlaying) startTimer();
 
@@ -411,7 +428,7 @@
                 if (charIndex < targetText.length) {
                     let nextSpan = allSpans[charIndex];
                     $(nextSpan).addClass('char-current');
-                    prosesAutoScroll(nextSpan); // Auto Scroll Maju
+                    prosesAutoScroll(nextSpan); 
                 }
 
                 $('#liveAcc').html(hitungAkurasiLive() + '<span class="fs-6 text-secondary">%</span>');
