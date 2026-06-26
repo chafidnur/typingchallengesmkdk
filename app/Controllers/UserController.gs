@@ -209,8 +209,10 @@ function getHallOfFameData() {
       if(userMap[fkdUser]) {
         if(!rekorSiswa[fkdUser] || wpm > rekorSiswa[fkdUser].wpm) {
           rekorSiswa[fkdUser] = {
+            avatar: ambilAvatarBase64(fkdUser),
             nama: userMap[fkdUser].nama,
             kelas: userMap[fkdUser].kelas,
+            tahun_ajaran: userMap[fkdUser].tahun_ajaran,
             gelar: userMap[fkdUser].gelar,
             wpm: wpm,
             accuracy: acc

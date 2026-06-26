@@ -267,16 +267,27 @@
 
     function logoutSistem() {
         Swal.fire({
-            title: 'KELUAR SISTEM?',
-            text: "Sesi Anda akan diakhiri.",
-            icon: 'warning',
+            title: 'KELUAR?',
+            text: "Sesi Anda akan segera dibersihkan.",
+            icon: 'question',
             background: '#1e293b', color: '#fff',
-            showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#3b82f6',
-            confirmButtonText: 'YA, LOGOUT', cancelButtonText: 'BATAL'
+            showCancelButton: true, confirmButtonColor: '#ef4444',
+            confirmButtonText: 'YA, KELUAR'
         }).then((result) => {
             if (result.isConfirmed) {
+                // Bersihkan semua jejak sesi
                 localStorage.clear();
-                loadPage('Login');
+                
+                // Notifikasi Sukses
+                Swal.fire({
+                    title: 'SESI BERSIH',
+                    text: 'Akses login Anda telah dihapus. Silakan login kembali jika ingin masuk ke sesi baru.',
+                    icon: 'success',
+                    background: '#1e293b', color: '#fff',
+                    timer: 3000, showConfirmButton: false
+                }).then(() => {
+                    loadPage('Login');
+                });
             }
         });
     }
