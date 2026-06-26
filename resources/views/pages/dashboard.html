@@ -1,10 +1,7 @@
 <style>
+    /* Styling Global Dashboard */
     .dashboard-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; min-height: 100vh; color: #fff; }
-    .stat-card {
-        background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 20px; padding: 25px; text-align: center; transition: transform 0.3s;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
+    .stat-card { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 25px; text-align: center; transition: transform 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
     .stat-card:hover { transform: translateY(-5px); border-color: rgba(59, 130, 246, 0.5); }
     .stat-value { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: 700; margin: 10px 0; }
     
@@ -13,23 +10,13 @@
     .text-glow-gold { color: #f59e0b; text-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
     .text-glow-red { color: #ef4444; text-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
     
-    .menu-card {
-        background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.1) 100%);
-        border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 20px; padding: 30px;
-        cursor: pointer; transition: all 0.3s; text-align: left; height: 100%;
-    }
-    .menu-card:hover {
-        background: linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(139,92,246,0.2) 100%);
-        box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);
-    }
+    .menu-card { background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.1) 100%); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 20px; padding: 30px; cursor: pointer; transition: all 0.3s; text-align: left; height: 100%; }
+    .menu-card:hover { background: linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(139,92,246,0.2) 100%); box-shadow: 0 0 25px rgba(139, 92, 246, 0.4); }
     .admin-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%); border-color: rgba(16, 185, 129, 0.3); }
     .admin-card:hover { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%); box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); }
 
-    .avatar-zone {
-        width: 70px; height: 70px; border-radius: 50%; border: 3px solid #3b82f6;
-        position: relative; overflow: hidden; cursor: pointer; background: #1e293b;
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
-    }
+    /* Interactive Avatar Styling */
+    .avatar-zone { width: 70px; height: 70px; border-radius: 50%; border: 3px solid #3b82f6; position: relative; overflow: hidden; cursor: pointer; background: #1e293b; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
     .avatar-zone img { width: 100%; height: 100%; object-fit: cover; }
     .avatar-overlay-hover { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; color: #fff; font-size: 0.75rem; font-weight: bold; }
     .avatar-zone:hover .avatar-overlay-hover { opacity: 1; }
@@ -48,15 +35,19 @@
                 <h2 class="fw-bold mb-0" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;" id="dashboardTitle">
                     <i class="fas fa-satellite-dish text-primary me-2"></i> MEMUAT DATA...
                 </h2>
-                <p class="text-secondary mb-0">
-                    Selamat datang, <span id="dashNamaUser" class="text-white fw-bold">User</span> 
-                    <span id="dashNamaKelas" class="badge bg-dark border border-info text-info ms-1">-</span>
-                    <span id="dashRoleBadge" class="badge bg-secondary ms-1">ROLE</span>
+                <p class="text-secondary mb-0 mt-1" style="font-size: 1.1rem;">
+                    Selamat datang, <span id="dashNamaUser" class="text-white fw-bold">User</span>
+                    <span id="wrapKelas" class="d-none">, kelas <span id="dashNamaKelas" class="text-info fw-bold"></span></span>
+                    <br>
+                    <span id="wrapGelar" class="d-none" style="font-size: 0.9rem;">
+                        <i class="fas fa-star text-warning me-1"></i> Gelar saat ini: <span id="dashGelar" class="text-warning fw-bold"></span>
+                    </span>
+                    <span id="dashRoleBadge" class="badge bg-secondary ms-2 align-middle">ROLE</span>
                 </p>
             </div>
         </div>
         <div class="d-flex">
-            <button class="btn btn-outline-warning rounded-pill fw-bold px-3 me-2" onclick="initDashboard()" title="Refresh Data">
+            <button class="btn btn-outline-info rounded-pill fw-bold px-3 me-2" onclick="initDashboard()" title="Refresh Data">
                 <i class="fas fa-sync-alt"></i> REFRESH
             </button>
             <button class="btn btn-outline-danger px-4 rounded-pill fw-bold" onclick="logoutSistem()">
@@ -70,14 +61,14 @@
             <div class="col-md-4">
                 <div class="stat-card">
                     <p class="text-secondary mb-0 fw-bold" style="letter-spacing: 2px;">TOTAL SISWA</p>
-                    <div class="stat-value text-glow-blue">-</div>
+                    <div class="stat-value text-glow-blue" id="adminTotalSiswa">-</div>
                     <small class="text-secondary">Akun Terdaftar</small>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stat-card">
                     <p class="text-secondary mb-0 fw-bold" style="letter-spacing: 2px;">BANK KALIMAT</p>
-                    <div class="stat-value text-glow-green">-</div>
+                    <div class="stat-value text-glow-green" id="adminTotalSoal">-</div>
                     <small class="text-secondary">Soal Tersedia</small>
                 </div>
             </div>
@@ -85,7 +76,7 @@
                 <div class="stat-card border-danger">
                     <p class="text-secondary mb-0 fw-bold" style="letter-spacing: 2px;">STATUS SISTEM</p>
                     <div class="stat-value text-glow-red">ONLINE</div>
-                    <small class="text-secondary">Server Google Apps Script</small>
+                    <small class="text-secondary">Server Berjalan Baik</small>
                 </div>
             </div>
         </div>
@@ -132,7 +123,7 @@
                         </div>
                         <h3 class="fw-bold text-white mb-0" style="font-family: 'Orbitron', sans-serif;">HALL OF FAME</h3>
                     </div>
-                    <p class="text-secondary">Pantau daftar 10 pengetik berkecepatan dewa di seluruh lingkungan sekolah.</p>
+                    <p class="text-secondary">Pantau daftar pengetik berkecepatan dewa di seluruh lingkungan sekolah.</p>
                 </div>
             </div>
         </div>
@@ -154,11 +145,11 @@
                     <small class="text-secondary">Tingkat Ketepatan</small>
                 </div>
             </div>
-            <div class="col-md-4" onclick="loadPage('Leaderboard')" style="cursor: pointer;" title="Lihat Klasemen Sekolah">
-                <div class="stat-card border-warning">
+            <div class="col-md-4">
+                <div class="stat-card border-warning" onclick="loadPage('Leaderboard')" style="cursor: pointer;" title="Lihat Klasemen Sekolah">
                     <p class="text-secondary mb-0 fw-bold" style="letter-spacing: 2px;">HALL OF FAME</p>
                     <div class="stat-value text-glow-gold"><i class="fas fa-trophy"></i></div>
-                    <small class="text-secondary">Klik untuk Lihat Peringkat</small>
+                    <small class="text-secondary">Lihat Peringkat Sekolah</small>
                 </div>
             </div>
         </div>
@@ -173,7 +164,7 @@
                         <h3 class="fw-bold text-white mb-0" style="font-family: 'Orbitron', sans-serif;">TRAINING MODE</h3>
                     </div>
                     <p class="text-secondary">Latihan mengetik harian dengan kalimat otomatis prodi. Sesi latihan dihitung untuk meraih gelar kebanggaan.</p>
-                    <button class="btn btn-primary mt-2 rounded-pill px-4 fw-bold w-100">MULAI LATIHAN <i class="fas fa-arrow-right ms-2"></i></button>
+                    <button class="btn btn-primary mt-2 rounded-pill px-4 fw-bold w-100">PLAY NOW <i class="fas fa-arrow-right ms-2"></i></button>
                 </div>
             </div>
         </div>
@@ -181,27 +172,38 @@
 </div>
 
 <script>
-    function pemicuPilihFileAvatar() { $('#hiddenAvatarInput').click(); }
+    function pemicuPilihFileAvatar() {
+        $('#hiddenAvatarInput').click();
+    }
 
     function prosesUploadAvatar(inputElement) {
         let file = inputElement.files[0];
-        if (!file || !file.type.startsWith('image/')) return;
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            Swal.fire({ icon: 'error', title: 'FORMAT SALAH', text: 'Wajib file gambar!', background: '#1e293b', color: '#fff' });
+            return;
+        }
 
-        let usernameActive = localStorage.getItem('username_user');
+        Swal.fire({ title: 'MEMPROSES', text: 'Mengunggah avatar...', background: '#1e293b', color: '#fff', allowOutsideClick: false, showConfirmButton: false, willOpen: () => { Swal.showLoading(); } });
+
+        let usernameActive = localStorage.getItem('username_user') || localStorage.getItem('nama_user');
         let reader = new FileReader();
         reader.onload = function(e) {
             let base64String = e.target.result;
             google.script.run
-                .withSuccessHandler(function(response) {
-                    if (response.status === 'success') {
+                .withSuccessHandler(function(res) {
+                    if (res.status === 'success') {
                         $('#userAvatarDisplay').attr('src', base64String);
+                        Swal.close();
+                    } else {
+                        Swal.fire('Gagal', res.message, 'error');
                     }
-                }).simpanAvatarUser(base64String, file.type, usernameActive);
+                })
+                .simpanAvatarUser(base64String, file.type, usernameActive);
         };
         reader.readAsDataURL(file);
     }
 
-    // FUNGSI INTI DASHBOARD UTAMA
     function initDashboard() {
         let namaPlayer = localStorage.getItem('nama_user');
         let rolePlayer = localStorage.getItem('role_user');
@@ -210,29 +212,32 @@
         
         if(namaPlayer) $('#dashNamaUser').text(namaPlayer);
         
-        // Baca Foto Profil
-        google.script.run
-            .withSuccessHandler(function(base64Src) {
+        // Render Avatar
+        if(usernamePlayer) {
+            google.script.run.withSuccessHandler(function(base64Src) {
                 if(base64Src) $('#userAvatarDisplay').attr('src', base64Src);
                 else $('#userAvatarDisplay').attr('src', 'https://api.dicebear.com/7.x/bottts/svg?seed=' + usernamePlayer);
             }).ambilAvatarBase64(usernamePlayer);
+        }
 
-        // FITUR BARU: Baca Nama Kelas dari database
-        google.script.run
-            .withSuccessHandler(function(namaKelas) {
+        // Ambil Data Stats, Kelas, dan Gelar
+        if(kdPlayer) {
+            // Asumsi Backend Yang Mulia mengirimkan Kelas dan Gelar bersama Stats, atau kita pakai fungsi yang kita buat sebelumnya
+            google.script.run.withSuccessHandler(function(namaKelas) {
                 if(namaKelas && namaKelas !== "-") {
-                    $('#dashNamaKelas').text(namaKelas).removeClass('d-none');
-                } else {
-                    $('#dashNamaKelas').addClass('d-none');
+                    $('#dashNamaKelas').text(namaKelas);
+                    $('#wrapKelas').removeClass('d-none');
                 }
             }).getKelasInfoUser(kdPlayer);
 
-        if(kdPlayer && typeof getUserStats === 'function') {
-            google.script.run
-                .withSuccessHandler(function(stats) {
-                    $('#statWpm').text(stats.wpm);
-                    $('#statAcc').text(stats.acc + '%');
-                }).getUserStats(kdPlayer);
+            google.script.run.withSuccessHandler(function(stats) {
+                $('#statWpm').text(stats.wpm);
+                $('#statAcc').text(stats.acc + '%');
+                if(stats.gelar && stats.gelar !== "") {
+                    $('#dashGelar').text(stats.gelar);
+                    $('#wrapGelar').removeClass('d-none');
+                }
+            }).getUserStats(kdPlayer); // Pastikan getUserStats di backend me-return properti 'gelar'
         }
         
         if(rolePlayer === 'ADMIN' || rolePlayer === 'GURU') {
@@ -243,43 +248,56 @@
         } else {
             $('#dashboardTitle').html('<i class="fas fa-gamepad text-primary me-2"></i> PLAYER HUB');
             $('#dashRoleBadge').text('SISWA').addClass('bg-primary').removeClass('bg-secondary');
-            $('#panelSiswa').removeClass('d-none');
             $('#panelAdmin').addClass('d-none');
+            $('#panelSiswa').removeClass('d-none');
         }
     }
 
-    // ========================================================
-    // FITUR BARU: ENGINE AUTO-LOGOUT 1 JAM KETIDAKAKTIFAN
-    // ========================================================
-    (function saringInaktivitas() {
-        let timerInaktif;
-        const durasiSatuJam = 3600000; // 1 jam dalam milidetik
-
-        function resetTimerSesi() {
-            clearTimeout(timerInaktif);
-            timerInaktif = setTimeout(function() {
+    function logoutSistem() {
+        Swal.fire({
+            title: 'KELUAR SISTEM?',
+            text: "Sesi Anda akan diakhiri.",
+            icon: 'warning',
+            background: '#1e293b', color: '#fff',
+            showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#3b82f6',
+            confirmButtonText: 'YA, LOGOUT', cancelButtonText: 'BATAL'
+        }).then((result) => {
+            if (result.isConfirmed) {
                 localStorage.clear();
-                // Kirim pemberitahuan paksa
+                loadPage('Login');
+            }
+        });
+    }
+
+    // ==========================================
+    // AUTO LOGOUT: 1 Jam Tanpa Aktivitas
+    // ==========================================
+    (function sistemKeamananIdle() {
+        let timeoutSesi;
+        const WAKTU_IDLE = 60 * 60 * 1000; // 1 Jam dalam Milidetik
+
+        function resetTimer() {
+            clearTimeout(timeoutSesi);
+            timeoutSesi = setTimeout(function() {
+                localStorage.clear();
                 Swal.fire({
-                    title: 'SESI KEDALUWARSA',
-                    text: 'Anda tidak aktif selama 1 jam. Sistem otomatis keluar demi keamanan data.',
-                    icon: 'warning',
+                    title: 'SESI BERAKHIR',
+                    text: 'Demi keamanan, Anda telah dilogout secara otomatis karena tidak ada aktivitas selama 1 jam.',
+                    icon: 'info',
                     background: '#1e293b', color: '#fff',
-                    confirmButtonColor: '#ef4444'
-                }).then(() => {
-                    loadPage('Login');
-                });
-            }, durasiSatuJam);
+                    confirmButtonColor: '#3b82f6'
+                }).then(() => { loadPage('Login'); });
+            }, WAKTU_IDLE);
         }
 
-        // Daftarkan semua aksi interaksi sebagai pemicu reset durasi tidak aktif
-        window.onload = resetTimerSesi;
-        document.onmousemove = resetTimerSesi;
-        document.onkeydown = resetTimerSesi;
-        document.onclick = resetTimerSesi;
-        document.onscroll = resetTimerSesi;
+        // Deteksi aktivitas keyboard atau mouse
+        window.onload = resetTimer;
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        document.onclick = resetTimer;
+        document.onscroll = resetTimer;
     })();
 
-    // Eksekusi muat data awal
+    // Init jalankan
     initDashboard();
 </script>
