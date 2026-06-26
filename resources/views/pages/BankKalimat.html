@@ -1,0 +1,281 @@
+<style>
+    .bank-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; min-height: 100vh; color: #fff; }
+    .glass-panel {
+        background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .table-dark-custom { color: #e2e8f0; border-collapse: separate; border-spacing: 0 8px; }
+    .table-dark-custom thead th { border-bottom: none; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 15px; }
+    .table-dark-custom tbody tr { background: rgba(15, 23, 42, 0.6); transition: transform 0.2s; }
+    .table-dark-custom tbody tr:hover { transform: scale(1.01); background: rgba(59, 130, 246, 0.1); }
+    .table-dark-custom td { border: none; padding: 15px; vertical-align: middle; }
+    .table-dark-custom td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+    .table-dark-custom td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+
+    /* Modal Form Custom */
+    .modal-content.dark-modal { background-color: #1e293b; border: 1px solid #334155; color: white; }
+    .modal-header { border-bottom: 1px solid #334155; }
+    .modal-footer { border-top: 1px solid #334155; }
+    .form-control-dark, .form-select-dark { background-color: #0f172a; border: 1px solid #334155; color: white; }
+    .form-control-dark:focus, .form-select-dark:focus { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); color: white; background-color: #0f172a;}
+    
+    .text-truncate-custom {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Batasi maksimal 2 baris text */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 450px;
+    }
+</style>
+
+<div class="bank-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">
+                <i class="fas fa-file-code text-info me-2"></i> BANK KALIMAT
+            </h2>
+            <p class="text-secondary mb-0">Manajemen Teks Tantangan Latihan Mengetik</p>
+        </div>
+        <button class="btn btn-outline-secondary rounded-pill fw-bold" onclick="loadPage('Dashboard')">
+            <i class="fas fa-arrow-left me-2"></i> KEMBALI
+        </button>
+    </div>
+
+    <div class="glass-panel">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="w-50">
+                <input type="text" id="searchKalimat" class="form-control form-control-dark rounded-pill" placeholder="Cari teks atau jurusan...">
+            </div>
+            <button class="btn btn-info text-dark rounded-pill fw-bold" onclick="bukaModalTambah()">
+                <i class="fas fa-plus-circle me-2"></i> TAMBAH KALIMAT
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-dark-custom w-100">
+                <thead>
+                    <tr>
+                        <th>Kode</th>
+                        <th>Jurusan</th>
+                        <th>Level</th>
+                        <th>Preview Teks Kalimat</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyTableKalimat">
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <div class="spinner-border text-info" role="status"></div>
+                            <div class="mt-2 text-secondary">Memuat data bank kalimat...</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalKalimat" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content dark-modal">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title fw-bold" style="font-family: 'Orbitron', sans-serif;" id="modalTitle">
+                    <i class="fas fa-edit text-info me-2"></i> EDITOR KALIMAT
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formKalimat">
+                <div class="modal-body row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label text-warning small fw-bold">Kode Kalimat</label>
+                        <input type="text" class="form-control form-control-dark border-warning" id="inKdKalimat" placeholder="Contoh: KLM-001 (Kosongkan utk Auto)">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-secondary small">Kategori Jurusan</label>
+                        <select class="form-select form-select-dark" id="inJurusan" required>
+                            <option value="UMUM">UMUM (Semua Jurusan)</option>
+                            <option value="TLM">TLM (Teknik Lab Medik)</option>
+                            <option value="FARMASI">FARMASI</option>
+                            <option value="KIMIA">KIMIA INDUSTRI</option>
+                            <option value="PERHOTELAN">PERHOTELAN</option>
+                            <option value="CAREGIVING">CAREGIVING</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-secondary small">Level Kesulitan</label>
+                        <select class="form-select form-select-dark" id="inLevel" required>
+                            <option value="Mudah">Mudah (Pemula)</option>
+                            <option value="Sedang">Sedang (Menengah)</option>
+                            <option value="Sulit">Sulit (Lanjutan)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label text-secondary small">Teks Tantangan (Wajib diperhatikan EYD & Typo)</label>
+                        <textarea class="form-control form-control-dark" id="inTeks" rows="5" required placeholder="Ketik atau paste kalimat dari AI di sini..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-info text-dark fw-bold" id="btnSimpanKalimat">
+                        <span id="spinSimpanKlm" class="spinner-border spinner-border-sm d-none me-1" role="status"></span>
+                        SIMPAN KALIMAT
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Menyimpan data mentah untuk referensi saat proses edit
+    let globalDataKalimat = [];
+
+    // Fungsi membuka modal untuk mode TAMBAH BARU
+    function bukaModalTambah() {
+        $('#formKalimat')[0].reset();
+        $('#inKdKalimat').prop('readonly', false).val('');
+        $('#modalTitle').html('<i class="fas fa-plus-circle text-info me-2"></i> TAMBAH KALIMAT BARU');
+        $('#modalKalimat').modal('show');
+    }
+
+    // Fungsi membuka modal untuk mode EDIT
+    function bukaModalEdit(kd_kalimat) {
+        let target = globalDataKalimat.find(k => k.kd_kalimat === kd_kalimat);
+        if(target) {
+            $('#inKdKalimat').val(target.kd_kalimat).prop('readonly', true); // ID tidak boleh diubah saat edit
+            $('#inJurusan').val(target.kategori.toUpperCase());
+            
+            // Format pencocokan level agar aman jika dari AI menggunakan uppercase/lowercase
+            let levelTeks = target.level.charAt(0).toUpperCase() + target.level.slice(1).toLowerCase();
+            $('#inLevel').val(levelTeks);
+            
+            $('#inTeks').val(target.teks);
+            
+            $('#modalTitle').html('<i class="fas fa-edit text-warning me-2"></i> EDIT KALIMAT');
+            $('#modalKalimat').modal('show');
+        }
+    }
+
+    // Fungsi memicu konfirmasi HAPUS data
+    function prosesHapus(kd_kalimat) {
+        Swal.fire({
+            title: 'Hapus Kalimat?',
+            text: "Data yang dihapus tidak bisa dikembalikan!",
+            icon: 'warning',
+            background: '#1e293b', color: '#fff',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                google.script.run
+                    .withSuccessHandler(res => {
+                        if(res.status === 'success') {
+                            Swal.fire({ icon: 'success', title: 'Terhapus!', text: res.message, background: '#1e293b', color: '#fff', timer: 1500, showConfirmButton: false });
+                            muatTabelKalimat();
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Gagal', text: res.message, background: '#1e293b', color: '#fff' });
+                        }
+                    })
+                    .hapusKalimat(kd_kalimat);
+            }
+        });
+    }
+
+    // Menarik data dari Spreadsheet dan merender ke Tabel
+    function muatTabelKalimat() {
+        $('#bodyTableKalimat').html('<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-info" role="status"></div></td></tr>');
+        
+        google.script.run
+            .withSuccessHandler(function(response) {
+                if(response.status === 'error') {
+                    $('#bodyTableKalimat').html(`<tr><td colspan="5" class="text-center text-danger py-4">${response.message}</td></tr>`);
+                    return;
+                }
+                
+                globalDataKalimat = response.data;
+                let html = '';
+                
+                if(globalDataKalimat.length === 0) {
+                    html = '<tr><td colspan="5" class="text-center text-secondary py-4">Bank kalimat masih kosong. Silakan tambah data baru.</td></tr>';
+                } else {
+                    globalDataKalimat.forEach(k => {
+                        // Desain Badge Warna-Warni Berdasarkan Level
+                        let lvlBadge = '';
+                        if(k.level.toLowerCase() === 'mudah') lvlBadge = `<span class="badge bg-success">MUDAH</span>`;
+                        else if(k.level.toLowerCase() === 'sedang') lvlBadge = `<span class="badge bg-warning text-dark">SEDANG</span>`;
+                        else if(k.level.toLowerCase() === 'sulit') lvlBadge = `<span class="badge bg-danger">SULIT</span>`;
+                        else lvlBadge = `<span class="badge bg-secondary">${k.level}</span>`;
+
+                        html += `
+                            <tr class="baris-kalimat">
+                                <td class="fw-bold text-warning kolom-cari">${k.kd_kalimat}</td>
+                                <td class="kolom-cari"><span class="badge border border-info text-info">${k.kategori}</span></td>
+                                <td>${lvlBadge}</td>
+                                <td>
+                                    <div class="text-truncate-custom text-secondary small kolom-cari" title="${k.teks}">
+                                        ${k.teks}
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-warning rounded-circle me-1" onclick="bukaModalEdit('${k.kd_kalimat}')" title="Edit">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="prosesHapus('${k.kd_kalimat}')" title="Hapus">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+                $('#bodyTableKalimat').html(html);
+            })
+            .getListKalimat();
+    }
+
+    $(document).ready(function() {
+        muatTabelKalimat(); // Panggil saat layar dibuka
+
+        // Logika Live Search di Tabel
+        $('#searchKalimat').on('keyup', function() {
+            let keyword = $(this).val().toLowerCase();
+            $('.baris-kalimat').filter(function() {
+                // Mencari berdasarkan teks pada class .kolom-cari (Kode, Jurusan, atau Teksnya)
+                $(this).toggle($(this).find('.kolom-cari').text().toLowerCase().indexOf(keyword) > -1);
+            });
+        });
+
+        // Submit Form Simpan/Edit
+        $('#formKalimat').on('submit', function(e) {
+            e.preventDefault();
+            
+            $('#btnSimpanKalimat').prop('disabled', true);
+            $('#spinSimpanKlm').removeClass('d-none');
+
+            let paketData = {
+                kd_kalimat: $('#inKdKalimat').val(),
+                kategori: $('#inJurusan').val(),
+                level: $('#inLevel').val(),
+                teks: $('#inTeks').val()
+            };
+
+            google.script.run
+                .withSuccessHandler(function(response) {
+                    $('#btnSimpanKalimat').prop('disabled', false);
+                    $('#spinSimpanKlm').addClass('d-none');
+                    
+                    if(response.status === 'success') {
+                        $('#modalKalimat').modal('hide');
+                        Swal.fire({ icon: 'success', title: 'BERHASIL', text: response.message, background: '#1e293b', color: '#fff', timer: 1500, showConfirmButton: false });
+                        muatTabelKalimat();
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'GAGAL', text: response.message, background: '#1e293b', color: '#fff' });
+                    }
+                })
+                .simpanKalimat(paketData);
+        });
+    });
+</script>
