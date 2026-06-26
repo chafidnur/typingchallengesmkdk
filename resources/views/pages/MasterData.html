@@ -205,8 +205,10 @@
                         <input type="text" class="form-control form-control-dark" id="inNis" placeholder="Isi - jika tidak ada">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-secondary small">Kode Kelas</label>
-                        <input type="text" class="form-control form-control-dark" id="inKelas" placeholder="Contoh: KLS-X-TKJ1">
+                        <label class="form-label text-warning small fw-bold">Pilih Kelas</label>
+                        <select class="form-select form-select-dark border-warning" id="inKelas">
+                            <option value="-">-- Pilih Kelas (Pilih ini jika Guru) --</option>
+                        </select>
                     </div>
 
                     <div class="col-md-6">
@@ -351,6 +353,26 @@
     $(document).ready(function() {
         // 1. Fungsi Memuat Data Tabel
         function muatTabelSiswa() {
+            // Fungsi Memuat Dropdown Kelas Otomatis
+            function muatDropdownKelas() {
+                $('#inKelas').html('<option value="-">Memuat data kelas...</option>');
+                google.script.run
+                    .withSuccessHandler(function(data) {
+                        let html = '<option value="-">-- Pilih Kelas (Pilih ini jika Guru) --</option>';
+                        data.forEach(k => {
+                            html += `<option value="${k.kd_kelas}">${k.nama_kelas}</option>`;
+                        });
+                        $('#inKelas').html(html);
+                    })
+                    .withFailureHandler(function(err) {
+                        $('#inKelas').html('<option value="-">Gagal memuat kelas</option>');
+                    })
+                    .getListKelasAktif();
+            }
+
+            // Panggil fungsinya agar langsung berjalan saat menu Master Data dibuka
+            muatDropdownKelas();
+
             google.script.run
                 .withSuccessHandler(function(data) {
                     let html = '';

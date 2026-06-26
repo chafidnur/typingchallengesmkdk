@@ -193,3 +193,34 @@ function getRiwayatSiswa(kd_user) {
     return { status: "error", message: "Sistem gagal membaca data: " + e.message };
   }
 }
+
+/**
+ * Mengambil daftar kelas aktif untuk Dropdown di Form Registrasi User
+ */
+function getListKelasAktif() {
+  try {
+    const ss = SpreadsheetApp.openById(DB_ID);
+    const sheetKelas = ss.getSheetByName("kelas");
+    if(!sheetKelas) return [];
+    
+    const data = sheetKelas.getDataRange().getValues();
+    let listKelas = [];
+    
+    // Looping dari baris 2 (mengabaikan header)
+    for(let i = 1; i < data.length; i++) {
+      // Cek apakah status_aktif (Kolom F / Indeks 5) bernilai 1
+      if(String(data[i][5]).trim() === "1") { 
+        listKelas.push({
+          kd_kelas: data[i][0],    // Kolom A: kd_kelas
+          nama_kelas: data[i][3]   // Kolom D: nama_kelas
+        });
+      }
+    }
+    
+    // Urutkan sesuai abjad nama kelas
+    listKelas.sort((a, b) => a.nama_kelas.localeCompare(b.nama_kelas));
+    return listKelas;
+  } catch(e) {
+    return []; // Jika error, kembalikan array kosong agar UI tidak rusak
+  }
+}
